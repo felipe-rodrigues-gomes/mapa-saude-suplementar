@@ -1,0 +1,54 @@
+/// Tabela desconectada: formas de pagamento à rede, para o gráfico da ficha.
+table dFormaPagamento
+	lineageTag: e7c39201-9df9-598f-ae54-072b1d30f4ab
+
+	/// Parte dos eventos conhecidos ou avisados paga na forma da linha (contas 4111 a 4119 do DIOPS), 12 meses.
+	measure '% dos eventos (forma de pagamento)' =
+			VAR _forma = SELECTEDVALUE ( dFormaPagamento[CODIGO] )
+			RETURN
+			    SWITCH (
+			        _forma,
+			        "procedimento", DIVIDE ( SUM ( fContabil[ev_procedimento_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) ),
+			        "pacote", DIVIDE ( SUM ( fContabil[ev_pacote_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) ),
+			        "rede_propria", DIVIDE ( SUM ( fContabil[ev_rede_propria_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) ),
+			        "rede_indireta", DIVIDE ( SUM ( fContabil[ev_rede_indireta_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) ),
+			        "reembolso", DIVIDE ( SUM ( fContabil[ev_reembolso_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) ),
+			        "capitation", DIVIDE ( SUM ( fContabil[ev_capitation_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) ),
+			        "orcamento_global", DIVIDE ( SUM ( fContabil[ev_orcamento_global_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) )
+			    )
+		formatString: 0%
+		displayFolder: 3. Como paga a rede
+		lineageTag: 62d34ea6-2491-51cd-adc3-6d1089d06ee9
+
+	column CODIGO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CODIGO
+		lineageTag: ae6c5810-d100-53b9-b910-8a5b9c194e5c
+
+		annotation SummarizationSetBy = Automatic
+
+	column FORMA
+		dataType: string
+		summarizeBy: none
+		sourceColumn: FORMA
+		lineageTag: 8612b46e-6c22-569d-beb9-e2b5605a5c75
+		sortByColumn: ORDEM
+
+		annotation SummarizationSetBy = Automatic
+
+	column ORDEM
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ORDEM
+		lineageTag: 1de3db0d-7cd1-5eac-ad57-da2a70f90796
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dFormaPagamento = m
+		mode: import
+		source =
+				let
+				    Fonte = Parquet.Document ( File.Contents ( PastaDados & "dFormaPagamento.parquet" ) )
+				in
+				    Fonte

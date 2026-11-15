@@ -1,0 +1,53 @@
+/// Meses da carteira (fins de trimestre) e do IGR.
+table dCompetencia
+	lineageTag: 71c1f79b-453a-510b-a6ef-b7bc4669219d
+
+	column COMPETENCIA
+		dataType: string
+		summarizeBy: none
+		sourceColumn: COMPETENCIA
+		lineageTag: 68e03d44-a780-54b1-8a9f-90ae75b580a7
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATA
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		summarizeBy: none
+		sourceColumn: DATA
+		lineageTag: 154d4e6f-090a-5763-bdb0-fbec8e8e65ad
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROTULO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ROTULO
+		lineageTag: f03204b7-936a-5a1e-b011-40138149a761
+		sortByColumn: COMPETENCIA
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANO
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ANO
+		lineageTag: d98bb58b-19b7-539e-a583-bd44ff0d41cf
+
+		annotation SummarizationSetBy = Automatic
+
+	column FIM_DE_TRIMESTRE
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: FIM_DE_TRIMESTRE
+		lineageTag: 56193755-c21e-5e77-bda9-e8c997ed033a
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dCompetencia = m
+		mode: import
+		source =
+				let
+				    Fonte = Parquet.Document ( File.Contents ( PastaDados & "dCompetencia.parquet" ) )
+				in
+				    Fonte

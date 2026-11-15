@@ -1,0 +1,5 @@
+/// Pasta com os parquet gerados por scripts/exportar_pbi.py. Quem clonar o repositório troca aqui e atualiza.
+expression PastaDados = "C:\Users\Felipe\Projects\benchmark-operadoras-ans\dados\pbi\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 34570eca-1719-5f3f-a7b4-44d7c8d3b4b3
+
+	annotation PBI_ResultType = Text

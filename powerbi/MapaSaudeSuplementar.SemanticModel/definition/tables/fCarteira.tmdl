@@ -1,0 +1,68 @@
+/// Vidas médico-hospitalares por competência, operadora, contratação e faixa de reajuste.
+table fCarteira
+	lineageTag: 95af4a09-1451-5463-a3d9-61fb4cb19014
+
+	/// Vidas médico-hospitalares ativas (SIB/ANS) no mês do contexto.
+	measure Clientes = SUM ( fCarteira[ATIVOS] )
+		formatString: #,0
+		displayFolder: 6. Carteira
+		lineageTag: f8392d5e-5b23-5154-8de7-e522653943c1
+
+	/// Última faixa de reajuste da ANS.
+	measure '% com 59 anos ou mais' = DIVIDE ( CALCULATE ( [Clientes], fCarteira[FAIXA_REAJ] = "59 anos ou mais" ), [Clientes] )
+		formatString: 0.0%
+		displayFolder: 6. Carteira
+		lineageTag: 286f3dbb-02dc-5574-aea7-aea4319aa14a
+
+	measure '% em plano individual' = DIVIDE ( CALCULATE ( [Clientes], fCarteira[CONTRATACAO] = "Individual ou familiar" ), [Clientes] )
+		formatString: 0.0%
+		displayFolder: 6. Carteira
+		lineageTag: e101ad81-ca76-51ea-93b5-97a3c07d13a7
+
+	column COMPETENCIA
+		dataType: string
+		summarizeBy: none
+		sourceColumn: COMPETENCIA
+		lineageTag: 4c7a94d3-097e-5464-92a2-4ef70c396fe0
+
+		annotation SummarizationSetBy = Automatic
+
+	column REG
+		dataType: string
+		summarizeBy: none
+		sourceColumn: REG
+		lineageTag: 20178630-771d-5fa1-a93a-6d75d2719a4e
+
+		annotation SummarizationSetBy = Automatic
+
+	column CONTRATACAO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CONTRATACAO
+		lineageTag: 884edc62-e122-5624-96bb-19f6531f105c
+
+		annotation SummarizationSetBy = Automatic
+
+	column FAIXA_REAJ
+		dataType: string
+		summarizeBy: none
+		sourceColumn: FAIXA_REAJ
+		lineageTag: 3f9d6835-315f-5483-85b0-05e93470a887
+
+		annotation SummarizationSetBy = Automatic
+
+	column ATIVOS
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ATIVOS
+		lineageTag: dce24bd3-9851-5529-9caf-c7953343a7cf
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fCarteira = m
+		mode: import
+		source =
+				let
+				    Fonte = Parquet.Document ( File.Contents ( PastaDados & "fCarteira.parquet" ) )
+				in
+				    Fonte

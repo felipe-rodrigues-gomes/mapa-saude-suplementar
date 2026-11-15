@@ -1,0 +1,12 @@
+EVALUATE
+CALCULATETABLE (
+    ADDCOLUMNS (
+        VALUES ( dIndicador[INDICADOR] ),
+        "valor", [Valor da operadora],
+        "p25", [P25 do porte],
+        "mediana", [Mediana do porte],
+        "p75", [P75 do porte],
+        "posicao", [Posição no porte]
+    ),
+    dOperadora[REG] = "317144"
+)

@@ -1,0 +1,18 @@
+EVALUATE
+UNION (
+    SELECTCOLUMNS (
+        FILTER ( VALUES ( dTrimestre[ANO] ), dTrimestre[ANO] <= 2025 ),
+        "ano", dTrimestre[ANO],
+        "operacao", [Resultado da operação (R$ bi)],
+        "aplicacoes", [Resultado das aplicações (R$ bi)],
+        "lucro", [Lucro líquido (R$ bi)],
+        "sinist_ano", CALCULATE ( [Sinistralidade (no ano)], dTrimestre[TRI] = 4 )
+    ),
+    ROW (
+        "ano", 9999,
+        "operacao", [Resultado da operação 2021–2025 (R$ bi)],
+        "aplicacoes", [Resultado das aplicações 2021–2025 (R$ bi)],
+        "lucro", [Lucro líquido 2021–2025 (R$ bi)],
+        "sinist_ano", CALCULATE ( [Sinistralidade (no ano)], dTrimestre[PERIODO] = "2026T2" )
+    )
+)

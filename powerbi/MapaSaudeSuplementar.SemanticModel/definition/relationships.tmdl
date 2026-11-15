@@ -1,0 +1,23 @@
+relationship 40b39b8f-89ee-5c61-ab8e-0d62b5ecf3fa
+	fromColumn: fContabil.REG
+	toColumn: dOperadora.REG
+
+relationship 2fd9020b-6057-5e12-8361-2a42443b4443
+	fromColumn: fContabil.PERIODO
+	toColumn: dTrimestre.PERIODO
+
+relationship 0fd842ec-f0ba-5347-a4cb-cdbe41611a01
+	fromColumn: fCarteira.REG
+	toColumn: dOperadora.REG
+
+relationship 051d5b76-1898-5be2-90ac-e2853589a2f3
+	fromColumn: fCarteira.COMPETENCIA
+	toColumn: dCompetencia.COMPETENCIA
+
+relationship 7ce6b490-5d80-5b38-9b2d-348c20a5b814
+	fromColumn: fIGR.REG
+	toColumn: dOperadora.REG
+
+relationship 9d395a54-070b-5404-8802-c35d19949297
+	fromColumn: fIGR.COMPETENCIA
+	toColumn: dCompetencia.COMPETENCIA

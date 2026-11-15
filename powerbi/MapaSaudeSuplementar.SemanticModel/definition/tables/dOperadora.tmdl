@@ -1,0 +1,503 @@
+/// Operadoras médico-hospitalares: cadastro da ANS e foto atual dos indicadores (ind_operadora).
+table dOperadora
+	lineageTag: da2da9f8-ad8d-5e02-84ce-e29ebf62e2a4
+
+	/// Ativas, ≥ 1.000 vidas médicas, receita nos últimos 12 meses e sinistralidade entre 30% e 150%.
+	measure 'Operadoras no ranking' = CALCULATE ( COUNTROWS ( dOperadora ), dOperadora[RANKING_OK] = TRUE () )
+		formatString: #,0
+		displayFolder: 4. Operadoras
+		lineageTag: 0eb00d9c-a934-5d5b-b3d7-8aaff79031bd
+
+	/// Resultado da operação negativo nos 12 meses até jun/2026. Só operadoras do ranking.
+	measure '% com prejuízo na operação' =
+			VAR _ranking = FILTER ( dOperadora, dOperadora[RANKING_OK] = TRUE () )
+			RETURN
+			    DIVIDE ( COUNTROWS ( FILTER ( _ranking, dOperadora[resultado_operacional] < 0 ) ), COUNTROWS ( _ranking ) )
+		formatString: 0.0%
+		displayFolder: 4. Operadoras
+		lineageTag: 042672f8-80b1-58f7-bdad-a491187729c5
+
+	/// Lucro líquido negativo nos 12 meses até jun/2026. Só operadoras do ranking.
+	measure '% com prejuízo no fim' =
+			VAR _ranking = FILTER ( dOperadora, dOperadora[RANKING_OK] = TRUE () )
+			RETURN
+			    DIVIDE ( COUNTROWS ( FILTER ( _ranking, dOperadora[resultado_liquido] < 0 ) ), COUNTROWS ( _ranking ) )
+		formatString: 0.0%
+		displayFolder: 4. Operadoras
+		lineageTag: a415aa1b-aaf9-52af-8704-08d05b5feb40
+
+	/// Prejuízo na operação, mas lucro no fim graças ao resultado financeiro. Só operadoras do ranking.
+	measure '% salvas pelas aplicações' =
+			VAR _ranking = FILTER ( dOperadora, dOperadora[RANKING_OK] = TRUE () )
+			RETURN
+			    DIVIDE ( COUNTROWS ( FILTER ( _ranking, dOperadora[resultado_operacional] < 0 && dOperadora[resultado_liquido] > 0 ) ), COUNTROWS ( _ranking ) )
+		formatString: 0.0%
+		displayFolder: 4. Operadoras
+		lineageTag: ec7c1497-5406-5456-8771-b1d5a6f63aee
+
+	measure 'Operadora escolhida' = SELECTEDVALUE ( dOperadora[NOME_EXIBICAO], "Escolha uma operadora" )
+		displayFolder: 5. Ficha
+		lineageTag: 9463ef86-2e7b-5e42-a762-7c7d7a6f9c78
+
+	measure 'Perfil da operadora' =
+			IF (
+			    HASONEVALUE ( dOperadora[REG] ),
+			    SELECTEDVALUE ( dOperadora[MODALIDADE] ) & " · porte " & LOWER ( SELECTEDVALUE ( dOperadora[PORTE] ) )
+			        & " · registro ANS " & SELECTEDVALUE ( dOperadora[REG] ) & " · sede " & SELECTEDVALUE ( dOperadora[UF_SEDE] )
+			)
+		displayFolder: 5. Ficha
+		lineageTag: 6cbaa203-ce98-5034-90b5-b809e8dc1c21
+
+	measure 'Aviso de ranking' =
+			VAR _motivo = SELECTEDVALUE ( dOperadora[MOTIVO_FORA_RANKING] )
+			RETURN
+			    IF (
+			        HASONEVALUE ( dOperadora[REG] ),
+			        IF ( ISBLANK ( _motivo ), "Comparada com as operadoras do mesmo porte.", "Fora do ranking: " & _motivo & ". Os números aparecem, sem comparação." )
+			    )
+		displayFolder: 5. Ficha
+		lineageTag: 6cde30ac-51e7-541f-9a31-8bcf0cf4216b
+
+	/// Mediana, trimestre a trimestre, das operadoras do ranking com o mesmo porte da escolhida (porte atual).
+	measure 'Sinistralidade (12 meses) – mediana do porte' =
+			VAR _porte = SELECTEDVALUE ( dOperadora[PORTE] )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( _porte ),
+			        CALCULATE (
+			            MEDIANX (
+			                FILTER ( VALUES ( dOperadora[REG] ), [Sinistralidade (12 meses)] >= 0.3 && [Sinistralidade (12 meses)] <= 1.5 ),
+			                [Sinistralidade (12 meses)]
+			            ),
+			            REMOVEFILTERS ( dOperadora ),
+			            dOperadora[PORTE] = _porte,
+			            dOperadora[RANKING_OK] = TRUE ()
+			        )
+			    )
+		formatString: 0.0%
+		displayFolder: 5. Ficha
+		lineageTag: 2fb400aa-6bbc-5a38-bb7c-ba49f8987678
+
+	column REG
+		dataType: string
+		summarizeBy: none
+		sourceColumn: REG
+		lineageTag: 46f4d5eb-b2dc-5904-a0d8-950c24696f7f
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME_EXIBICAO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: NOME_EXIBICAO
+		lineageTag: e3f94097-91d3-5088-9bd7-951393fd362e
+
+		annotation SummarizationSetBy = Automatic
+
+	column RAZAO_SOCIAL
+		dataType: string
+		summarizeBy: none
+		sourceColumn: RAZAO_SOCIAL
+		lineageTag: 8007f25c-c499-51b5-82c5-38419f799d11
+
+		annotation SummarizationSetBy = Automatic
+
+	column CNPJ
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CNPJ
+		lineageTag: 7d438d12-bbbc-59f7-b398-dd8c4ef3c066
+
+		annotation SummarizationSetBy = Automatic
+
+	column MODALIDADE
+		dataType: string
+		summarizeBy: none
+		sourceColumn: MODALIDADE
+		lineageTag: 3abd0046-664f-5f66-97be-62e64e6e7f1d
+
+		annotation SummarizationSetBy = Automatic
+
+	column PORTE
+		dataType: string
+		summarizeBy: none
+		sourceColumn: PORTE
+		lineageTag: 4d893fb8-107d-58c0-abf9-d3aa6e953d87
+
+		annotation SummarizationSetBy = Automatic
+
+	column ATIVA
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: ATIVA
+		lineageTag: a393e7c3-2dab-59e4-894c-dcfe68e03fd4
+
+		annotation SummarizationSetBy = Automatic
+
+	column UF_SEDE
+		dataType: string
+		summarizeBy: none
+		sourceColumn: UF_SEDE
+		lineageTag: c26045fe-f523-513f-99c2-0183318bca37
+
+		annotation SummarizationSetBy = Automatic
+
+	column REGIAO_SEDE
+		dataType: string
+		summarizeBy: none
+		sourceColumn: REGIAO_SEDE
+		lineageTag: 5abe1d04-588f-52f1-9cb6-10afbf1e53d0
+
+		annotation SummarizationSetBy = Automatic
+
+	column UF_PRINCIPAL
+		dataType: string
+		summarizeBy: none
+		sourceColumn: UF_PRINCIPAL
+		lineageTag: 9c581fda-bf1b-548d-8ea5-4b33432defc4
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinistralidade
+		dataType: double
+		summarizeBy: none
+		sourceColumn: sinistralidade
+		lineageTag: 95ba83be-0658-5eef-9e7b-3c9883d892e7
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinistralidade_ano_ant
+		dataType: double
+		summarizeBy: none
+		sourceColumn: sinistralidade_ano_ant
+		lineageTag: fa0998f8-4f40-5611-a23a-a295d53ed0d5
+
+		annotation SummarizationSetBy = Automatic
+
+	column indice_combinado
+		dataType: double
+		summarizeBy: none
+		sourceColumn: indice_combinado
+		lineageTag: 77460023-43bc-5045-9687-47697bdb2682
+
+		annotation SummarizationSetBy = Automatic
+
+	column indice_desp_adm
+		dataType: double
+		summarizeBy: none
+		sourceColumn: indice_desp_adm
+		lineageTag: 00b68dab-4733-5b54-b8fb-896d18d4e8ee
+
+		annotation SummarizationSetBy = Automatic
+
+	column margem_liquida
+		dataType: double
+		summarizeBy: none
+		sourceColumn: margem_liquida
+		lineageTag: 6a938cc7-bdf2-5f84-bd79-d80f996a99bd
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_liquido
+		dataType: double
+		summarizeBy: none
+		sourceColumn: resultado_liquido
+		lineageTag: b0249af2-ca17-5278-8e9d-7d7e9ebf116c
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_operacional
+		dataType: double
+		summarizeBy: none
+		sourceColumn: resultado_operacional
+		lineageTag: 59497a4c-fa69-5bb1-a70e-22450bf33746
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_financeiro
+		dataType: double
+		summarizeBy: none
+		sourceColumn: resultado_financeiro
+		lineageTag: 5b95dae1-2833-5afb-85c4-ea9f221e5c8c
+
+		annotation SummarizationSetBy = Automatic
+
+	column contraprest_efet
+		dataType: double
+		summarizeBy: none
+		sourceColumn: contraprest_efet
+		lineageTag: 636123ba-87c7-5db1-905c-83b95aab3c0b
+
+		annotation SummarizationSetBy = Automatic
+
+	column vidas_mh
+		dataType: double
+		summarizeBy: none
+		sourceColumn: vidas_mh
+		lineageTag: ec322565-f97b-5c05-84cf-c733d1c7334c
+
+		annotation SummarizationSetBy = Automatic
+
+	column cresc_vidas_12m
+		dataType: double
+		summarizeBy: none
+		sourceColumn: cresc_vidas_12m
+		lineageTag: f238272d-6c54-549d-a02b-081161efe7be
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_59mais
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_59mais
+		lineageTag: 441d986a-f5bc-56cb-bc33-8be2c4340d89
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_individual
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_individual
+		lineageTag: c795cc0a-856a-5d74-9cd2-7fcdd0886a45
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_empresarial
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_empresarial
+		lineageTag: 142d7f63-ee33-5716-b9c9-6352fa1a03e3
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_adesao
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_adesao
+		lineageTag: a327cda1-4adf-5d7f-9b6d-f57558dc30cc
+
+		annotation SummarizationSetBy = Automatic
+
+	column receita_vida_mes
+		dataType: double
+		summarizeBy: none
+		sourceColumn: receita_vida_mes
+		lineageTag: bed23477-4ee6-596a-a2cd-514e5e7aea12
+
+		annotation SummarizationSetBy = Automatic
+
+	column custo_vida_mes
+		dataType: double
+		summarizeBy: none
+		sourceColumn: custo_vida_mes
+		lineageTag: b71d6d0d-229e-5df4-a8fd-382f09de476a
+
+		annotation SummarizationSetBy = Automatic
+
+	column igr_12m
+		dataType: double
+		summarizeBy: none
+		sourceColumn: igr_12m
+		lineageTag: 3500c7cf-7996-5603-97b7-07ca313aa404
+
+		annotation SummarizationSetBy = Automatic
+
+	column idss
+		dataType: double
+		summarizeBy: none
+		sourceColumn: idss
+		lineageTag: 5de2243c-80b4-5a9e-a4f9-811ae483b11c
+
+		annotation SummarizationSetBy = Automatic
+
+	column idqs
+		dataType: double
+		summarizeBy: none
+		sourceColumn: idqs
+		lineageTag: 0d8744f3-e79a-5b53-bb71-12f3fd412b49
+
+		annotation SummarizationSetBy = Automatic
+
+	column idga
+		dataType: double
+		summarizeBy: none
+		sourceColumn: idga
+		lineageTag: 2543f025-57ee-5de6-b494-81f30134412d
+
+		annotation SummarizationSetBy = Automatic
+
+	column idsm
+		dataType: double
+		summarizeBy: none
+		sourceColumn: idsm
+		lineageTag: 094491bb-db6f-5064-ab78-81b56a8cbe6f
+
+		annotation SummarizationSetBy = Automatic
+
+	column idgr
+		dataType: double
+		summarizeBy: none
+		sourceColumn: idgr
+		lineageTag: 20965dc0-60e0-5bcf-9792-49828cd99a1a
+
+		annotation SummarizationSetBy = Automatic
+
+	column glosa_inicial
+		dataType: double
+		summarizeBy: none
+		sourceColumn: glosa_inicial
+		lineageTag: 92e45880-a13d-5046-84d4-53a6e31b59f0
+
+		annotation SummarizationSetBy = Automatic
+
+	column glosa_final
+		dataType: double
+		summarizeBy: none
+		sourceColumn: glosa_final
+		lineageTag: 55604533-3122-5d5d-8ba6-537241902e39
+
+		annotation SummarizationSetBy = Automatic
+
+	column flag_glosa
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: flag_glosa
+		lineageTag: 92f295d2-e294-545d-8bf5-d402bcb33b81
+
+		annotation SummarizationSetBy = Automatic
+
+	column tempo_pagamento_dias
+		dataType: double
+		summarizeBy: none
+		sourceColumn: tempo_pagamento_dias
+		lineageTag: 4f0cd2f3-312e-5a16-a635-05be3a0b0d54
+
+		annotation SummarizationSetBy = Automatic
+
+	column sus_por_mil
+		dataType: double
+		summarizeBy: none
+		sourceColumn: sus_por_mil
+		lineageTag: 6a78b8cd-de33-5fd7-b445-eeb4f48a484a
+
+		annotation SummarizationSetBy = Automatic
+
+	column sus_falha_por_mil
+		dataType: double
+		summarizeBy: none
+		sourceColumn: sus_falha_por_mil
+		lineageTag: c6a1e005-37de-501d-8a0b-7c8f8b973330
+
+		annotation SummarizationSetBy = Automatic
+
+	column sus_pct_justica
+		dataType: double
+		summarizeBy: none
+		sourceColumn: sus_pct_justica
+		lineageTag: d74b44da-24d5-502e-bbd2-c546b9c6dace
+
+		annotation SummarizationSetBy = Automatic
+
+	column sus_pct_pago
+		dataType: double
+		summarizeBy: none
+		sourceColumn: sus_pct_pago
+		lineageTag: e1b37335-8879-5a46-8bf0-81b221e8dee2
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_judicial
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_judicial
+		lineageTag: d7c10a9a-e229-5270-9551-926c7660bd29
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_ev_procedimento
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_ev_procedimento
+		lineageTag: 9825d43a-8a27-5cfe-8c17-dd81a4141da0
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_ev_pacote
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_ev_pacote
+		lineageTag: f22e96a4-2bc9-58a3-b858-73026f3889fa
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_ev_rede_propria
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_ev_rede_propria
+		lineageTag: 34b999f4-90d7-55da-b56e-f62229a90022
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_ev_rede_indireta
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_ev_rede_indireta
+		lineageTag: 93ea914d-22aa-5aa1-9004-84f8a339e2ff
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_ev_capitation
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_ev_capitation
+		lineageTag: 3b38e6e5-c7d2-505c-b30f-0a440656f063
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_ev_orcamento_global
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_ev_orcamento_global
+		lineageTag: 5d323c6d-8479-51db-82a9-6e98cc01a86f
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_ev_reembolso
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_ev_reembolso
+		lineageTag: c1cc60f5-78ce-5704-bfa7-47b017a05566
+
+		annotation SummarizationSetBy = Automatic
+
+	column RANKING_OK
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: RANKING_OK
+		lineageTag: 88679b53-df3a-594d-a9dc-02505d4d73d8
+
+		annotation SummarizationSetBy = Automatic
+
+	column MOTIVO_FORA_RANKING
+		dataType: string
+		summarizeBy: none
+		sourceColumn: MOTIVO_FORA_RANKING
+		lineageTag: d4f5b222-bab4-515a-89e5-4a99c40a487c
+
+		annotation SummarizationSetBy = Automatic
+
+	column BUSCA
+		dataType: string
+		summarizeBy: none
+		sourceColumn: BUSCA
+		lineageTag: a92179d0-72d2-5f27-ad7d-fe1e3a25b30c
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dOperadora = m
+		mode: import
+		source =
+				let
+				    Fonte = Parquet.Document ( File.Contents ( PastaDados & "dOperadora.parquet" ) )
+				in
+				    Fonte

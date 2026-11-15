@@ -1,0 +1,10 @@
+.venv/
+dados/brutos/
+__pycache__/
+*.pyc
+
+# Power BI: cache local e configurações da máquina
+powerbi/**/.pbi/cache.abf
+powerbi/**/.pbi/localSettings.json
+dados/tratados/
+.hallmark/

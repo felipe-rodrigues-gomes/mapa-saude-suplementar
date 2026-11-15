@@ -1,0 +1,13 @@
+EVALUATE
+ROW (
+    "no_ranking", [Operadoras no ranking],
+    "pct_prej_operacao", [% com prejuízo na operação],
+    "pct_prej_fim", [% com prejuízo no fim],
+    "pct_salvas", [% salvas pelas aplicações],
+    "clientes_set26", CALCULATE ( [Clientes], dCompetencia[COMPETENCIA] = "202609" ),
+    "pct59_set26", CALCULATE ( [% com 59 anos ou mais], dCompetencia[COMPETENCIA] = "202609" ),
+    "igr_jul25_jun26", CALCULATE ( [Reclamações por 100 mil clientes], dCompetencia[COMPETENCIA] >= "202507", dCompetencia[COMPETENCIA] <= "202606" ),
+    "sinist_12m_2026T2", CALCULATE ( [Sinistralidade (12 meses)], dTrimestre[PERIODO] = "2026T2" ),
+    "procedimento_12m", CALCULATE ( [% dos eventos por procedimento], dTrimestre[PERIODO] = "2026T2" ),
+    "judicial_12m", CALCULATE ( [Despesa judicial (% dos eventos)], dTrimestre[PERIODO] = "2026T2" )
+)

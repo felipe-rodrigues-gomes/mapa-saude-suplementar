@@ -1,0 +1,49 @@
+/// Reclamações (NIP) e beneficiários da assistência médica por operadora e mês.
+table fIGR
+	lineageTag: 62336493-3495-5547-ad71-d9802ef1b8e0
+
+	/// IGR da ANS: reclamações na NIP ÷ beneficiários da assistência médica × 100 mil, ponderado pelos meses do contexto.
+	measure 'Reclamações por 100 mil clientes' = DIVIDE ( SUM ( fIGR[QTD_RECLAMACOES] ), SUM ( fIGR[QTD_BENEFICIARIOS] ) ) * 100000
+		formatString: #,0.0
+		displayFolder: 7. Reclamações
+		lineageTag: f0007eef-6bc7-5466-8cc9-bb7b60f6e80a
+
+	column REG
+		dataType: string
+		summarizeBy: none
+		sourceColumn: REG
+		lineageTag: 9a750772-fee8-58c6-bf83-50656c4a5dfa
+
+		annotation SummarizationSetBy = Automatic
+
+	column COMPETENCIA
+		dataType: string
+		summarizeBy: none
+		sourceColumn: COMPETENCIA
+		lineageTag: 7fc239cb-f235-5ad1-a7ae-2d131df5f160
+
+		annotation SummarizationSetBy = Automatic
+
+	column QTD_RECLAMACOES
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: QTD_RECLAMACOES
+		lineageTag: 11e051d2-c802-5fc1-a106-86dd4975b3de
+
+		annotation SummarizationSetBy = Automatic
+
+	column QTD_BENEFICIARIOS
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: QTD_BENEFICIARIOS
+		lineageTag: d4a8e989-a007-5590-b690-1b1b05d45ddf
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fIGR = m
+		mode: import
+		source =
+				let
+				    Fonte = Parquet.Document ( File.Contents ( PastaDados & "fIGR.parquet" ) )
+				in
+				    Fonte

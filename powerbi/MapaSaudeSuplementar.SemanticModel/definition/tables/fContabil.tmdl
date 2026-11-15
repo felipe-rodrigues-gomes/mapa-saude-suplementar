@@ -1,0 +1,500 @@
+/// DIOPS por operadora e trimestre: acumulado no ano (_ytd) e 12 meses (_12m).
+table fContabil
+	lineageTag: bf6b8106-b385-5b20-948d-5c4edc2629d1
+
+	/// Quanto da mensalidade volta em atendimento. (eventos + |corresponsabilidade cedida|) ÷ (contraprestações efetivas + |corresponsabilidade cedida|), 12 meses. Soma numerador e denominador antes de dividir: é a média ponderada pela receita.
+	measure 'Sinistralidade (12 meses)' = DIVIDE ( SUM ( fContabil[sinist_num_12m] ), SUM ( fContabil[sinist_den_12m] ) )
+		formatString: 0.0%
+		displayFolder: 1. Sinistralidade
+		lineageTag: 57eb4b79-c2bc-50e5-99b9-eb04a8edf728
+
+	/// Mesma fórmula, acumulada de janeiro até o trimestre. É o número que a ANS divulga.
+	measure 'Sinistralidade (no ano)' = DIVIDE ( SUM ( fContabil[sinist_num_ytd] ), SUM ( fContabil[sinist_den_ytd] ) )
+		formatString: 0.0%
+		displayFolder: 1. Sinistralidade
+		lineageTag: 98798125-faab-52b5-8836-2fde9b82f4a2
+
+	/// (eventos + |CCT| + despesas administrativas + comercialização) ÷ (contraprestações efetivas + |CCT| + receitas administrativas). Acima de 100%, a operação do plano dá prejuízo.
+	measure 'Índice combinado (12 meses)' = DIVIDE ( SUM ( fContabil[comb_num_12m] ), SUM ( fContabil[comb_den_12m] ) )
+		formatString: 0.0%
+		displayFolder: 1. Sinistralidade
+		lineageTag: cdddf664-e42c-5819-b95b-3b6868195ec4
+
+	/// Receitas menos despesas da operação de saúde (contas 31+32+33+34+37 − 41−43−44−46). Ano fechado: usa o acumulado do 4º trimestre.
+	measure 'Resultado da operação (R$ bi)' = DIVIDE ( CALCULATE ( SUM ( fContabil[resultado_operacional_ytd] ), dTrimestre[FIM_DE_ANO] = TRUE () ), 1E9 )
+		formatString: #,0.0
+		displayFolder: 2. Resultado
+		lineageTag: b0154cad-8e33-5f3d-84ba-3dfdc581a156
+
+	/// Soma dos cinco anos fechados.
+	measure 'Resultado da operação 2021–2025 (R$ bi)' = CALCULATE ( [Resultado da operação (R$ bi)], dTrimestre[ANO] >= 2021, dTrimestre[ANO] <= 2025 )
+		formatString: #,0.0
+		displayFolder: 2. Resultado
+		lineageTag: 3b02ba0b-7822-5836-997c-930dfc6fac16
+
+	/// Receitas menos despesas financeiras (contas 35 − 45). Ano fechado: usa o acumulado do 4º trimestre.
+	measure 'Resultado das aplicações (R$ bi)' = DIVIDE ( CALCULATE ( SUM ( fContabil[resultado_financeiro_ytd] ), dTrimestre[FIM_DE_ANO] = TRUE () ), 1E9 )
+		formatString: #,0.0
+		displayFolder: 2. Resultado
+		lineageTag: cdea3207-d82d-5452-bb7e-68f56f071c0a
+
+	/// Soma dos cinco anos fechados.
+	measure 'Resultado das aplicações 2021–2025 (R$ bi)' = CALCULATE ( [Resultado das aplicações (R$ bi)], dTrimestre[ANO] >= 2021, dTrimestre[ANO] <= 2025 )
+		formatString: #,0.0
+		displayFolder: 2. Resultado
+		lineageTag: 923d6752-3cd3-5b58-9976-7764b08d7f4d
+
+	/// Receitas − despesas − impostos e participações (contas 3 − 4 − 61). Ano fechado: usa o acumulado do 4º trimestre.
+	measure 'Lucro líquido (R$ bi)' = DIVIDE ( CALCULATE ( SUM ( fContabil[resultado_liquido_ytd] ), dTrimestre[FIM_DE_ANO] = TRUE () ), 1E9 )
+		formatString: #,0.0
+		displayFolder: 2. Resultado
+		lineageTag: f7295b88-6d60-51d5-8adc-5e305589175b
+
+	/// Soma dos cinco anos fechados.
+	measure 'Lucro líquido 2021–2025 (R$ bi)' = CALCULATE ( [Lucro líquido (R$ bi)], dTrimestre[ANO] >= 2021, dTrimestre[ANO] <= 2025 )
+		formatString: #,0.0
+		displayFolder: 2. Resultado
+		lineageTag: ed6dd7cd-0e7e-5749-8502-38783ebd4c0e
+
+	measure 'Lucro líquido 12 meses (R$ mi)' = DIVIDE ( SUM ( fContabil[resultado_liquido_12m] ), 1E6 )
+		formatString: #,0.0
+		displayFolder: 2. Resultado
+		lineageTag: 01bdf07e-b290-558e-a02a-74a8dfdacd10
+
+	/// Quantas vezes as aplicações renderam o que a operação rendeu.
+	measure 'Aplicações ÷ operação (ano)' = DIVIDE ( [Resultado das aplicações (R$ bi)], [Resultado da operação (R$ bi)] )
+		formatString: 0.0x
+		displayFolder: 2. Resultado
+		lineageTag: 69d4774d-4064-5ff3-a0e2-ab667440884c
+
+	/// Eventos conhecidos ou avisados, 12 meses, por forma de pagamento (contas 4111 a 4119).
+	measure '% dos eventos por procedimento' = DIVIDE ( SUM ( fContabil[ev_procedimento_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) )
+		formatString: 0.0%
+		displayFolder: 3. Como paga a rede
+		lineageTag: 147e9106-6467-593e-9bdf-3ce0d7a126be
+
+	/// Eventos conhecidos ou avisados, 12 meses, por forma de pagamento (contas 4111 a 4119).
+	measure '% dos eventos em pacote' = DIVIDE ( SUM ( fContabil[ev_pacote_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) )
+		formatString: 0.0%
+		displayFolder: 3. Como paga a rede
+		lineageTag: e3525d87-f86a-540a-a298-9cf27121b4bc
+
+	/// Eventos conhecidos ou avisados, 12 meses, por forma de pagamento (contas 4111 a 4119).
+	measure '% dos eventos em rede própria' = DIVIDE ( SUM ( fContabil[ev_rede_propria_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) )
+		formatString: 0.0%
+		displayFolder: 3. Como paga a rede
+		lineageTag: 4f1f8023-3e5c-5f95-83dd-1cf7242ef26f
+
+	/// Eventos conhecidos ou avisados, 12 meses, por forma de pagamento (contas 4111 a 4119).
+	measure '% dos eventos em rede indireta' = DIVIDE ( SUM ( fContabil[ev_rede_indireta_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) )
+		formatString: 0.0%
+		displayFolder: 3. Como paga a rede
+		lineageTag: e71d3679-760e-5a7a-96d8-388b8466480b
+
+	/// Eventos conhecidos ou avisados, 12 meses, por forma de pagamento (contas 4111 a 4119).
+	measure '% dos eventos por capitation' = DIVIDE ( SUM ( fContabil[ev_capitation_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) )
+		formatString: 0.0%
+		displayFolder: 3. Como paga a rede
+		lineageTag: b3ab4c84-14c8-5938-a362-6655ef4e39fd
+
+	/// Eventos conhecidos ou avisados, 12 meses, por forma de pagamento (contas 4111 a 4119).
+	measure '% dos eventos por orçamento global' = DIVIDE ( SUM ( fContabil[ev_orcamento_global_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) )
+		formatString: 0.0%
+		displayFolder: 3. Como paga a rede
+		lineageTag: 6a4f5198-93f8-5e5a-b36f-47c805fb88ce
+
+	/// Eventos conhecidos ou avisados, 12 meses, por forma de pagamento (contas 4111 a 4119).
+	measure '% dos eventos por reembolso' = DIVIDE ( SUM ( fContabil[ev_reembolso_12m] ), SUM ( fContabil[ev_conhecidos_12m] ) )
+		formatString: 0.0%
+		displayFolder: 3. Como paga a rede
+		lineageTag: 544fd1fe-1b76-5f19-aba5-3ea04071c177
+
+	/// Despesas judiciais com eventos cobertos (411xxxx7) e não cobertos (4413x9x4) ÷ eventos indenizáveis, 12 meses.
+	measure 'Despesa judicial (% dos eventos)' = DIVIDE ( SUM ( fContabil[jud_total_12m] ), SUM ( fContabil[desp_assist_12m] ) )
+		formatString: 0.00%
+		displayFolder: 3. Como paga a rede
+		lineageTag: 4df5cf97-952d-5e91-a0d5-0b05770cf5f0
+
+	column REG
+		dataType: string
+		summarizeBy: none
+		sourceColumn: REG
+		lineageTag: eca08883-baad-5cd5-91b1-8ba2888e1088
+
+		annotation SummarizationSetBy = Automatic
+
+	column PERIODO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: PERIODO
+		lineageTag: 05d76923-19d3-50ff-abc5-88d8c099a4c8
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinist_num_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: sinist_num_ytd
+		lineageTag: cf1fd012-5baf-5265-aab9-26198c853534
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinist_num_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: sinist_num_12m
+		lineageTag: 13796800-cb98-56ee-9979-150ad4df445c
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinist_den_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: sinist_den_ytd
+		lineageTag: 60153f7b-2c8c-5694-a504-b0186e15065b
+
+		annotation SummarizationSetBy = Automatic
+
+	column sinist_den_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: sinist_den_12m
+		lineageTag: 83518092-7d80-5c9a-86d9-c77829fc1428
+
+		annotation SummarizationSetBy = Automatic
+
+	column comb_num_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: comb_num_ytd
+		lineageTag: 0704e44a-7da4-59de-be16-5c4f1b44a623
+
+		annotation SummarizationSetBy = Automatic
+
+	column comb_num_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: comb_num_12m
+		lineageTag: e1579dd8-e74b-5881-bfc0-f885e945f68e
+
+		annotation SummarizationSetBy = Automatic
+
+	column comb_den_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: comb_den_ytd
+		lineageTag: 95069533-3ac5-5980-92b7-64551b1c50bb
+
+		annotation SummarizationSetBy = Automatic
+
+	column comb_den_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: comb_den_12m
+		lineageTag: d169a18b-9a8d-55fc-8ff1-4affffbe06f2
+
+		annotation SummarizationSetBy = Automatic
+
+	column contraprest_efet_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: contraprest_efet_ytd
+		lineageTag: 30bf99ad-34d0-5865-a635-ad95e298b64b
+
+		annotation SummarizationSetBy = Automatic
+
+	column contraprest_efet_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: contraprest_efet_12m
+		lineageTag: 513a2bd1-2d6c-537d-b8ec-8083443b200f
+
+		annotation SummarizationSetBy = Automatic
+
+	column desp_assist_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: desp_assist_ytd
+		lineageTag: 94bea535-7ecf-5935-9ccf-5f93db81837a
+
+		annotation SummarizationSetBy = Automatic
+
+	column desp_assist_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: desp_assist_12m
+		lineageTag: 943243f2-0a6f-565f-900f-806f589d3550
+
+		annotation SummarizationSetBy = Automatic
+
+	column desp_adm_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: desp_adm_ytd
+		lineageTag: ef8fc3cf-41fd-597f-9c59-09ff377d9d7e
+
+		annotation SummarizationSetBy = Automatic
+
+	column desp_adm_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: desp_adm_12m
+		lineageTag: f1d519f9-0abc-5a7b-8b16-36800b00e715
+
+		annotation SummarizationSetBy = Automatic
+
+	column desp_comerc_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: desp_comerc_ytd
+		lineageTag: 5e37ba3c-db62-50e5-aa03-c28262164ea1
+
+		annotation SummarizationSetBy = Automatic
+
+	column desp_comerc_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: desp_comerc_12m
+		lineageTag: ab50827d-09ab-5049-a1e6-b3d102f9b918
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_liquido_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: resultado_liquido_ytd
+		lineageTag: 826713d4-027e-5a2e-91d8-d74532b892f1
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_liquido_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: resultado_liquido_12m
+		lineageTag: bdc8b33e-04e7-5a6d-a8a8-753b51eabfa8
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_operacional_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: resultado_operacional_ytd
+		lineageTag: 093e79e4-28a5-5c90-9e23-4a704bc9f83f
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_operacional_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: resultado_operacional_12m
+		lineageTag: d9a0e056-64d9-5db7-9b98-6e6bc176ee8f
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_financeiro_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: resultado_financeiro_ytd
+		lineageTag: 59623957-ec84-56a8-b59b-ef602dab2a9c
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado_financeiro_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: resultado_financeiro_12m
+		lineageTag: 1f169cfb-8c6d-55cb-9a8a-34aa6a0e8596
+
+		annotation SummarizationSetBy = Automatic
+
+	column jud_total_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: jud_total_ytd
+		lineageTag: fccce6e8-e020-5091-9a1d-2cbbb7506abc
+
+		annotation SummarizationSetBy = Automatic
+
+	column jud_total_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: jud_total_12m
+		lineageTag: 3a3eb1a7-61bf-5cff-a7af-0cd391d5d221
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_conhecidos_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_conhecidos_ytd
+		lineageTag: 69e1ffa0-bb3c-5dc9-a6cb-dc4b1339a6a9
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_conhecidos_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_conhecidos_12m
+		lineageTag: cd758e8e-432c-52d3-b112-e69a6e0ba16a
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_procedimento_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_procedimento_ytd
+		lineageTag: fa77e1b3-92cd-5ff0-92a2-5cb092716f3e
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_procedimento_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_procedimento_12m
+		lineageTag: d06b44d1-a506-5c3a-ac39-28c4821f4275
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_pacote_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_pacote_ytd
+		lineageTag: 0512e499-be6a-5c28-9306-9404b8a0e8d1
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_pacote_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_pacote_12m
+		lineageTag: f01f93f2-8530-5641-aab0-d0108e547a45
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_rede_propria_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_rede_propria_ytd
+		lineageTag: 6986db7b-5117-541a-bdf6-e042eaf5884c
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_rede_propria_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_rede_propria_12m
+		lineageTag: f31f8586-bc57-56c5-b221-87db4f94ab23
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_rede_indireta_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_rede_indireta_ytd
+		lineageTag: 01fe7335-544c-5b1e-9e56-464f1f94f0c3
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_rede_indireta_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_rede_indireta_12m
+		lineageTag: 9cdc96c6-c05a-5be9-9999-541c15fc1f9e
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_capitation_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_capitation_ytd
+		lineageTag: a3d9071e-fd81-56a2-a9bd-4b0085a2e9c9
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_capitation_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_capitation_12m
+		lineageTag: ed58cdf0-b30c-507a-b5e3-b76733f6f21d
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_orcamento_global_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_orcamento_global_ytd
+		lineageTag: 3252ab59-d5fa-5d6c-9cc8-bd4f8dd6eb06
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_orcamento_global_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_orcamento_global_12m
+		lineageTag: e17febfc-aadc-5b74-a183-c902afdf367f
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_reembolso_ytd
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_reembolso_ytd
+		lineageTag: d739202a-2070-5416-8420-2c9dd21adbe7
+
+		annotation SummarizationSetBy = Automatic
+
+	column ev_reembolso_12m
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: ev_reembolso_12m
+		lineageTag: 5097ff90-97ec-5dc1-b785-9ce0e335e3d8
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fContabil = m
+		mode: import
+		source =
+				let
+				    Fonte = Parquet.Document ( File.Contents ( PastaDados & "fContabil.parquet" ) )
+				in
+				    Fonte

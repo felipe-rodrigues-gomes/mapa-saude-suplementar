@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa da saúde suplementar</title>
+<meta name="description" content="Os dados públicos da ANS sobre planos de saúde, organizados para ler: resultado, sinistralidade, clientes, qualidade, uso do SUS e a ficha de cada operadora.">
+<meta property="og:title" content="Mapa da saúde suplementar">
+<meta property="og:description" content="Em cinco anos, a operação dos planos médicos deu prejuízo. O lucro veio das aplicações.">
+<meta name="theme-color" content="#f6f4ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2312324a'/%3E%3Crect x='7' y='17' width='6' height='8' fill='%23d1495b'/%3E%3Crect x='19' y='8' width='6' height='17' fill='%232a9d8f'/%3E%3C/svg%3E">
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="topo">
+  <div class="container topo-linha">
+    <a class="marca" href="#inicio">Mapa da saúde suplementar</a>
+    <nav aria-label="Seções">
+      <ul class="menu">
+        <li><a href="#resultado">Resultado</a></li>
+        <li><a href="#mensalidade">Mensalidade</a></li>
+        <li><a href="#clientes">Clientes</a></li>
+        <li><a href="#qualidade">Qualidade</a></li>
+        <li><a href="#sus">SUS</a></li>
+        <li><a href="#operadora">Sua operadora</a></li>
+        <li><a href="#metodo">Como foi feito</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="conteudo">
+
+<!-- 1. abertura: o achado e a busca -->
+<section class="abertura" id="inicio" aria-labelledby="t-abertura">
+  <div class="container abertura-grade">
+    <div class="abertura-texto">
+      <h1 id="t-abertura">O lucro vem das aplicações.</h1>
+      <p class="abertura-frase">De 2021 a 2025, a operação perdeu R$&nbsp;3,6&nbsp;bilhões.</p>
+      <form class="busca" role="search" data-busca>
+        <label for="busca-abertura">Procure a sua operadora</label>
+        <div class="busca-campo">
+          <input id="busca-abertura" type="search" autocomplete="off" placeholder="Nome ou registro na ANS" aria-describedby="busca-ajuda" data-busca-input>
+          <button type="submit" class="botao">Ver a ficha</button>
+        </div>
+        <p id="busca-ajuda" class="nota">682 operadoras ativas, comparadas com as do mesmo porte.</p>
+        <ul class="sugestoes" role="listbox" hidden data-busca-lista></ul>
+      </form>
+    </div>
+    <figure class="placar" aria-label="Resultado somado de 2021 a 2025, operadoras médico-hospitalares">
+      <div class="placar-linha perda">
+        <span class="placar-num num" data-v="acumulado.operacao">−3,6</span>
+        <span class="placar-rot">bilhões de reais na operação do plano</span>
+      </div>
+      <div class="placar-linha ganho">
+        <span class="placar-num num" data-v="acumulado.aplicacoes">+48,1</span>
+        <span class="placar-rot">bilhões nas aplicações financeiras</span>
+      </div>
+      <div class="placar-linha lucro">
+        <span class="placar-num num" data-v="acumulado.lucro">37,6</span>
+        <span class="placar-rot">bilhões de lucro líquido, somando os cinco anos</span>
+      </div>
+      <figcaption class="nota">Demonstrações contábeis entregues à ANS. Bate com os números que a agência divulgou.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 2. resultado ano a ano -->
+<section class="secao" id="resultado" aria-labelledby="t-resultado">
+  <div class="container grade-2">
+    <div class="secao-texto">
+      <h2 id="t-resultado">A operação só voltou ao azul em 2024.</h2>
+      <p class="lead">As aplicações renderam em todos os anos. Em 2022, compensaram um prejuízo de R$&nbsp;10,7&nbsp;bilhões na operação.</p>
+      <div class="destaque">
+        <span class="destaque-num num" data-v="pct_salvas" data-fmt="pct0">20%</span>
+        <p>das operadoras perdem dinheiro com o plano e só fecham no lucro graças às aplicações (12 meses até jun/2026).</p>
+      </div>
+      <p class="nota">Aplicar as reservas faz parte do negócio: a ANS exige que as operadoras guardem dinheiro para pagar atendimentos já feitos. O que surpreende é a proporção.</p>
+    </div>
+    <figure class="grafico" aria-labelledby="g-anos-leg">
+      <div class="legenda" id="g-anos-leg">
+        <span class="chave perda">Operação do plano</span>
+        <span class="chave ganho">Aplicações</span>
+        <span class="chave lucro">Lucro líquido</span>
+        <span class="unidade">R$ bilhões por ano</span>
+      </div>
+      <div class="svg-alvo" data-grafico="anos"></div>
+      <table class="tabela-acessivel visually-hidden" data-tabela="anos"><caption>Resultado por ano, R$ bilhões</caption></table>
+    </figure>
+  </div>
+</section>
+
+<!-- 3. sinistralidade -->
+<section class="secao secao-papel2" id="mensalidade" aria-labelledby="t-mensalidade">
+  <div class="container">
+    <div class="grade-2">
+      <div class="secao-texto">
+        <h2 id="t-mensalidade">De cada R$&nbsp;100 de mensalidade, R$&nbsp;82 voltam em atendimento.</h2>
+        <p class="lead">Era R$&nbsp;89,50 no pico pós-pandemia, em 2022. Nas autogestões, que não visam lucro, passa de R$&nbsp;92.</p>
+      </div>
+      <figure class="grafico">
+        <div class="legenda">
+          <span class="chave tinta">Mercado</span>
+          <span class="chave quieta">Cada modalidade</span>
+          <span class="unidade">Sinistralidade em 12 meses; eixo começa em 70%</span>
+        </div>
+        <div class="svg-alvo" data-grafico="sinistralidade"></div>
+      </figure>
+    </div>
+    <div class="ranking" data-ranking>
+      <div class="ranking-topo">
+        <h3>Compare dentro do mesmo porte</h3>
+        <div class="filtros">
+          <label>Porte
+            <select data-filtro="porte">
+              <option value="Grande">Grande (mais de 100 mil clientes)</option>
+              <option value="Médio">Médio (20 a 100 mil)</option>
+              <option value="Pequeno">Pequeno (até 20 mil)</option>
+            </select>
+          </label>
+          <label>Modalidade
+            <select data-filtro="modalidade"><option value="">Todas</option></select>
+          </label>
+          <label>Com clientes no estado
+            <select data-filtro="uf"><option value="">Brasil</option></select>
+          </label>
+        </div>
+      </div>
+      <p class="nota" data-ranking-nota>A contabilidade é nacional: o filtro de estado mostra as operadoras com clientes nele, não uma sinistralidade do estado.</p>
+      <div class="tabela-rolagem">
+        <table class="tabela" data-ranking-tabela>
+          <thead><tr>
+            <th scope="col" class="t-nome">Operadora</th>
+            <th scope="col" class="num">Clientes</th>
+            <th scope="col" class="num">Volta em atendimento</th>
+            <th scope="col" class="num">Custos a cada R$ 100</th>
+            <th scope="col" class="num">Lucro sobre receita</th>
+          </tr></thead>
+          <tbody><tr><td colspan="5" class="nota">Carregando as operadoras…</td></tr></tbody>
+        </table>
+      </div>
+      <button type="button" class="botao-texto" data-ranking-mais hidden>Mostrar todas</button>
+    </div>
+  </div>
+</section>
+
+<!-- 4. clientes -->
+<section class="secao" id="clientes" aria-labelledby="t-clientes">
+  <div class="container">
+    <div class="grade-2 grade-mapa">
+      <div class="secao-texto">
+        <h2 id="t-clientes">Um em cada quatro brasileiros tem plano médico.</h2>
+        <p class="lead">São 53,1 milhões de clientes. Em São Paulo, 40%; em Roraima, 4%. Toque num estado.</p>
+        <div class="painel-uf" data-painel-uf aria-live="polite">
+          <p class="nota">Cobertura em set/2026: clientes de plano médico ÷ população estimada pelo IBGE.</p>
+        </div>
+        <form class="busca busca-cidade" role="search" data-cidade>
+          <label for="busca-cidade">E na sua cidade?</label>
+          <div class="busca-campo">
+            <input id="busca-cidade" type="search" autocomplete="off" placeholder="Nome do município" data-cidade-input>
+          </div>
+          <ul class="sugestoes" role="listbox" hidden data-cidade-lista></ul>
+          <p class="resposta-cidade" data-cidade-resposta aria-live="polite"></p>
+        </form>
+      </div>
+      <figure class="mapa" aria-label="Cobertura de plano médico por estado">
+        <div class="svg-alvo" data-grafico="mapa"></div>
+        <div class="escala" aria-hidden="true"><span>5%</span><span class="escala-barra"></span><span>40%</span></div>
+      </figure>
+    </div>
+    <div class="grade-2 grade-baixa">
+      <div class="secao-texto">
+        <h3>O plano individual está sumindo.</h3>
+        <p>Desde dez/2021, os planos empresariais ganharam 5 milhões de clientes. Os individuais perderam 573 mil, e os coletivos por adesão, 569 mil. E a carteira envelhece: 16,6% têm 59 anos ou mais.</p>
+      </div>
+      <figure class="grafico">
+        <div class="legenda">
+          <span class="chave tinta">Empresarial</span>
+          <span class="chave perda">Individual ou familiar</span>
+          <span class="chave quieta">Coletivo por adesão</span>
+          <span class="unidade">Variação desde dez/2021, em mil clientes</span>
+        </div>
+        <div class="svg-alvo" data-grafico="contratacao"></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 5. custo × qualidade -->
+<section class="secao secao-papel2" id="qualidade" aria-labelledby="t-qualidade">
+  <div class="container grade-2">
+    <div class="secao-texto">
+      <h2 id="t-qualidade">Gastar mais com o cliente não reduz reclamação.</h2>
+      <p class="lead">Entre as operadoras com 20 mil clientes ou mais, a relação entre sinistralidade e reclamações na ANS é praticamente nula.</p>
+      <p class="nota">E a nota de qualidade da própria ANS (IDSS) quase não acompanha as reclamações. Passe o mouse ou toque num ponto.</p>
+      <div class="ponto-info" data-ponto-info aria-live="polite"></div>
+    </div>
+    <figure class="grafico">
+      <div class="legenda">
+        <span class="unidade">Cada ponto é uma operadora. Linhas: medianas.</span>
+      </div>
+      <div class="svg-alvo" data-grafico="dispersao"></div>
+    </figure>
+  </div>
+</section>
+
+<!-- 6. SUS -->
+<section class="secao" id="sus" aria-labelledby="t-sus">
+  <div class="container">
+    <div class="grade-2">
+      <div class="secao-texto">
+        <h2 id="t-sus">Quando o cliente de plano vai ao SUS, nem sempre é falha.</h2>
+        <p class="lead">A ANS identificou 3,9 milhões de internações e tratamentos de alto custo de clientes de plano no SUS, de 2019 a 2025. Só 18% apontam para problema de acesso.</p>
+        <p class="nota">Trauma e transplante passam pelo SUS de qualquer jeito. Oncologia e diálise ficam na zona cinzenta: continuidade de tratamento, centros públicos de referência ou rede escassa.</p>
+      </div>
+      <figure class="grafico">
+        <div class="svg-alvo" data-grafico="sus-grupos"></div>
+        <div class="svg-alvo" data-grafico="sus-motivos"></div>
+      </figure>
+    </div>
+    <div class="grade-3 numeros-sus">
+      <div class="destaque">
+        <span class="destaque-num num">1,41×</span>
+        <p>o uso esperado do SUS entre clientes de medicina de grupo, considerando os estados onde atuam. Seguradoras: 0,45×.</p>
+      </div>
+      <div class="destaque">
+        <span class="destaque-num num" data-v="justica_mi" data-fmt="mi">R$ 985 mi</span>
+        <p>cobrados pelo SUS estão parados na Justiça, de R$ 5 bilhões cobrados das operadoras.</p>
+      </div>
+      <div class="destaque">
+        <span class="destaque-num num" data-v="justica_top5_pct" data-fmt="pct0">87%</span>
+        <p>desse valor suspenso é de 5 operadoras. A de cada uma está na ficha.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ficha da operadora -->
+<section class="secao ficha-secao" id="operadora" aria-labelledby="t-ficha">
+  <div class="container">
+    <div class="ficha-topo">
+      <h2 id="t-ficha">Sua operadora, comparada com as do mesmo porte.</h2>
+      <form class="busca" role="search" data-busca>
+        <label for="busca-ficha">Procure a sua operadora</label>
+        <div class="busca-campo">
+          <input id="busca-ficha" type="search" autocomplete="off" placeholder="Nome ou registro na ANS" data-busca-input>
+          <button type="submit" class="botao">Ver a ficha</button>
+        </div>
+        <ul class="sugestoes" role="listbox" hidden data-busca-lista></ul>
+      </form>
+    </div>
+    <article class="ficha" data-ficha aria-live="polite">
+      <p class="nota">Escolha uma operadora para ver a ficha. Os números são os mesmos da ANS, comparados com as operadoras do mesmo porte.</p>
+    </article>
+  </div>
+</section>
+
+<!-- 8. método -->
+<section class="secao secao-papel2" id="metodo" aria-labelledby="t-metodo">
+  <div class="container grade-2">
+    <div class="secao-texto">
+      <h2 id="t-metodo">Como foi feito.</h2>
+      <p class="lead">Só dados abertos da ANS e, para a população, do IBGE. Cada número foi conferido com o que a ANS divulga.</p>
+      <ul class="lista-metodo">
+        <li><strong>Sinistralidade.</strong> (eventos + corresponsabilidade cedida) ÷ (contraprestações efetivas + corresponsabilidade cedida), o critério da ANS. Em 12 meses móveis, porque o 1º trimestre é sempre mais baixo.</li>
+        <li><strong>Ranking.</strong> Ativas, com 1.000 clientes ou mais, balanço dos últimos 12 meses e sinistralidade entre 30% e 150%. As demais aparecem com o motivo.</li>
+        <li><strong>Períodos.</strong> Contabilidade e clientes: até jun/2026. Reclamações: jul/2025 a jun/2026. Nota da ANS: IDSS 2025. Glosa: 2º semestre de 2025. SUS: atendimentos de 2024.</li>
+      </ul>
+    </div>
+    <div>
+      <table class="tabela tabela-conferencia">
+        <caption>Conferência com os números da ANS</caption>
+        <thead><tr><th scope="col" class="t-nome">Indicador</th><th scope="col" class="num">Aqui</th><th scope="col" class="num">ANS</th></tr></thead>
+        <tbody>
+          <tr><td>Sinistralidade 2024</td><td class="num">83,7%</td><td class="num">83,8%</td></tr>
+          <tr><td>Sinistralidade 2025</td><td class="num">81,8%</td><td class="num">81,7%</td></tr>
+          <tr><td>Sinistralidade 1º sem. 2026</td><td class="num">81,9%</td><td class="num">81,9%</td></tr>
+          <tr><td>Lucro líquido 2025</td><td class="num">R$ 23,4 bi</td><td class="num">R$ 23,4 bi</td></tr>
+          <tr><td>Resultado da operação 2022</td><td class="num">−R$ 10,7 bi</td><td class="num">−R$ 10,7 bi</td></tr>
+          <tr><td>Lucro líquido 1º sem. 2026</td><td class="num">R$ 10,9 bi</td><td class="num">R$ 10,9 bi</td></tr>
+        </tbody>
+      </table>
+      <p class="nota">No caminho, a base aberta de taxa de cobertura da própria ANS veio com a população zerada; foi substituída pelas estimativas do IBGE. O código, as fontes e os demais problemas encontrados estão no repositório.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="rodape">
+  <div class="container rodape-grade">
+    <p class="marca">Mapa da saúde suplementar</p>
+    <p class="nota">Projeto independente, sem vínculo com a ANS nem com qualquer operadora. Dados abertos da ANS e do IBGE, atualizados em 15/11/2026.</p>
+    <ul class="rodape-links">
+      <li><a href="https://dadosabertos.ans.gov.br/FTP/PDA/" rel="noopener">Dados abertos da ANS</a></li>
+      <li><a href="https://github.com/felipe-rodrigues-gomes/mapa-saude-suplementar" rel="noopener">Código e método no GitHub</a></li>
+      <li><a href="https://github.com/felipe-rodrigues-gomes" rel="noopener" data-slot-link="autor">Feito por Felipe Rodrigues</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

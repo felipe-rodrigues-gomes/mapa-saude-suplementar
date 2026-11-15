@@ -1,0 +1,78 @@
+/// Trimestres do DIOPS (2021T1 em diante).
+table dTrimestre
+	lineageTag: ce0f5267-cebc-560b-924f-b441a13dee81
+
+	column PERIODO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: PERIODO
+		lineageTag: 28bd76b4-26c2-5c53-9437-ceedb98dc86b
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANO
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ANO
+		lineageTag: bdbc349a-8a6f-51ed-84ac-deff81129271
+
+		annotation SummarizationSetBy = Automatic
+
+	column TRI
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: TRI
+		lineageTag: fa536894-c951-5159-b1df-5e3c1efd5a13
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATA_FIM
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		summarizeBy: none
+		sourceColumn: DATA_FIM
+		lineageTag: 8b225b72-c182-54a2-a0ec-ce1e9fe47721
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROTULO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ROTULO
+		lineageTag: c61feb12-2a8e-5855-aacc-16c1d595f760
+		sortByColumn: ORDEM
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROTULO_CURTO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ROTULO_CURTO
+		lineageTag: 2da8ca52-2a54-522a-b0c2-1b06946832da
+		sortByColumn: ORDEM
+
+		annotation SummarizationSetBy = Automatic
+
+	column ORDEM
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ORDEM
+		lineageTag: 34e5d1ac-ef48-5f6c-94aa-fb0bc5960f09
+
+		annotation SummarizationSetBy = Automatic
+
+	column FIM_DE_ANO
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: FIM_DE_ANO
+		lineageTag: 74b1b30c-5591-5210-85a3-0f5dfd94d520
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dTrimestre = m
+		mode: import
+		source =
+				let
+				    Fonte = Parquet.Document ( File.Contents ( PastaDados & "dTrimestre.parquet" ) )
+				in
+				    Fonte

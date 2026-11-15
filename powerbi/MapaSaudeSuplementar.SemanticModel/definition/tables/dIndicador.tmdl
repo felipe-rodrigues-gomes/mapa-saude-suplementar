@@ -1,0 +1,221 @@
+/// Tabela desconectada: um indicador por linha, para a ficha da operadora.
+table dIndicador
+	lineageTag: 4b39bbca-b596-5dec-8663-1e6df2eefc17
+
+	/// Valor do indicador da linha para a operadora escolhida. Glosa improvável (flag) fica em branco.
+	measure 'Valor da operadora' =
+			VAR _codigo = SELECTEDVALUE ( dIndicador[CODIGO] )
+			RETURN
+			    IF (
+			        HASONEVALUE ( dOperadora[REG] ),
+			        SWITCH (
+			            _codigo,
+			            "sinistralidade", MAX ( dOperadora[sinistralidade] ),
+			            "indice_combinado", MAX ( dOperadora[indice_combinado] ),
+			            "margem_liquida", MAX ( dOperadora[margem_liquida] ),
+			            "indice_desp_adm", MAX ( dOperadora[indice_desp_adm] ),
+			            "receita_vida_mes", MAX ( dOperadora[receita_vida_mes] ),
+			            "custo_vida_mes", MAX ( dOperadora[custo_vida_mes] ),
+			            "cresc_vidas_12m", MAX ( dOperadora[cresc_vidas_12m] ),
+			            "pct_59mais", MAX ( dOperadora[pct_59mais] ),
+			            "igr_12m", MAX ( dOperadora[igr_12m] ),
+			            "idss", MAX ( dOperadora[idss] ),
+			            "tempo_pagamento_dias", MAX ( dOperadora[tempo_pagamento_dias] ),
+			            "sus_falha_por_mil", MAX ( dOperadora[sus_falha_por_mil] ),
+			            "sus_pct_justica", MAX ( dOperadora[sus_pct_justica] ),
+			            "pct_judicial", MAX ( dOperadora[pct_judicial] ),
+			            "pct_ev_rede_propria", MAX ( dOperadora[pct_ev_rede_propria] ),
+			            "glosa_inicial", IF ( SELECTEDVALUE ( dOperadora[flag_glosa] ), BLANK (), MAX ( dOperadora[glosa_inicial] ) )
+			        )
+			    )
+		displayFolder: 5. Ficha
+		lineageTag: c1e6895e-e055-520a-bb49-bb1572bb0fe8
+
+		formatStringDefinition = SWITCH ( SELECTEDVALUE ( dIndicador[FORMATO] ), "pct", "0.0%", "brl", "R$ #,0", "num0", "#,0", "num1", "#,0.0", "num3", "0.000", "#,0.0" )
+
+	/// P25 das operadoras do ranking com o mesmo porte da escolhida. Reclamações só entre as com 20 mil clientes ou mais; glosa sem os valores improváveis.
+	measure 'P25 do porte' =
+			VAR _codigo = SELECTEDVALUE ( dIndicador[CODIGO] )
+			VAR _porte = SELECTEDVALUE ( dOperadora[PORTE] )
+			VAR _grupo =
+			    FILTER ( ALL ( dOperadora ), dOperadora[PORTE] = _porte && dOperadora[RANKING_OK] = TRUE () )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( _porte ),
+			        SWITCH (
+			            _codigo,
+			            "sinistralidade", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sinistralidade] ) ), dOperadora[sinistralidade], 0.25 ),
+			            "indice_combinado", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[indice_combinado] ) ), dOperadora[indice_combinado], 0.25 ),
+			            "margem_liquida", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[margem_liquida] ) ), dOperadora[margem_liquida], 0.25 ),
+			            "indice_desp_adm", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[indice_desp_adm] ) ), dOperadora[indice_desp_adm], 0.25 ),
+			            "receita_vida_mes", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[receita_vida_mes] ) ), dOperadora[receita_vida_mes], 0.25 ),
+			            "custo_vida_mes", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[custo_vida_mes] ) ), dOperadora[custo_vida_mes], 0.25 ),
+			            "cresc_vidas_12m", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[cresc_vidas_12m] ) ), dOperadora[cresc_vidas_12m], 0.25 ),
+			            "pct_59mais", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_59mais] ) ), dOperadora[pct_59mais], 0.25 ),
+			            "igr_12m", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[igr_12m] ) && dOperadora[vidas_mh] >= 20000 ), dOperadora[igr_12m], 0.25 ),
+			            "idss", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[idss] ) ), dOperadora[idss], 0.25 ),
+			            "glosa_inicial", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[glosa_inicial] ) && NOT dOperadora[flag_glosa] ), dOperadora[glosa_inicial], 0.25 ),
+			            "tempo_pagamento_dias", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[tempo_pagamento_dias] ) ), dOperadora[tempo_pagamento_dias], 0.25 ),
+			            "sus_falha_por_mil", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sus_falha_por_mil] ) ), dOperadora[sus_falha_por_mil], 0.25 ),
+			            "sus_pct_justica", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sus_pct_justica] ) ), dOperadora[sus_pct_justica], 0.25 ),
+			            "pct_judicial", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_judicial] ) ), dOperadora[pct_judicial], 0.25 ),
+			            "pct_ev_rede_propria", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_ev_rede_propria] ) ), dOperadora[pct_ev_rede_propria], 0.25 )
+			        )
+			    )
+		displayFolder: 5. Ficha
+		lineageTag: 5f862d01-2121-5146-9c27-72f8dbc3f382
+
+		formatStringDefinition = SWITCH ( SELECTEDVALUE ( dIndicador[FORMATO] ), "pct", "0.0%", "brl", "R$ #,0", "num0", "#,0", "num1", "#,0.0", "num3", "0.000", "#,0.0" )
+
+	/// Mediana das operadoras do ranking com o mesmo porte da escolhida. Reclamações só entre as com 20 mil clientes ou mais; glosa sem os valores improváveis.
+	measure 'Mediana do porte' =
+			VAR _codigo = SELECTEDVALUE ( dIndicador[CODIGO] )
+			VAR _porte = SELECTEDVALUE ( dOperadora[PORTE] )
+			VAR _grupo =
+			    FILTER ( ALL ( dOperadora ), dOperadora[PORTE] = _porte && dOperadora[RANKING_OK] = TRUE () )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( _porte ),
+			        SWITCH (
+			            _codigo,
+			            "sinistralidade", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sinistralidade] ) ), dOperadora[sinistralidade], 0.5 ),
+			            "indice_combinado", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[indice_combinado] ) ), dOperadora[indice_combinado], 0.5 ),
+			            "margem_liquida", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[margem_liquida] ) ), dOperadora[margem_liquida], 0.5 ),
+			            "indice_desp_adm", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[indice_desp_adm] ) ), dOperadora[indice_desp_adm], 0.5 ),
+			            "receita_vida_mes", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[receita_vida_mes] ) ), dOperadora[receita_vida_mes], 0.5 ),
+			            "custo_vida_mes", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[custo_vida_mes] ) ), dOperadora[custo_vida_mes], 0.5 ),
+			            "cresc_vidas_12m", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[cresc_vidas_12m] ) ), dOperadora[cresc_vidas_12m], 0.5 ),
+			            "pct_59mais", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_59mais] ) ), dOperadora[pct_59mais], 0.5 ),
+			            "igr_12m", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[igr_12m] ) && dOperadora[vidas_mh] >= 20000 ), dOperadora[igr_12m], 0.5 ),
+			            "idss", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[idss] ) ), dOperadora[idss], 0.5 ),
+			            "glosa_inicial", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[glosa_inicial] ) && NOT dOperadora[flag_glosa] ), dOperadora[glosa_inicial], 0.5 ),
+			            "tempo_pagamento_dias", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[tempo_pagamento_dias] ) ), dOperadora[tempo_pagamento_dias], 0.5 ),
+			            "sus_falha_por_mil", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sus_falha_por_mil] ) ), dOperadora[sus_falha_por_mil], 0.5 ),
+			            "sus_pct_justica", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sus_pct_justica] ) ), dOperadora[sus_pct_justica], 0.5 ),
+			            "pct_judicial", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_judicial] ) ), dOperadora[pct_judicial], 0.5 ),
+			            "pct_ev_rede_propria", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_ev_rede_propria] ) ), dOperadora[pct_ev_rede_propria], 0.5 )
+			        )
+			    )
+		displayFolder: 5. Ficha
+		lineageTag: f89d854c-4dbc-572e-8312-70494fe22f13
+
+		formatStringDefinition = SWITCH ( SELECTEDVALUE ( dIndicador[FORMATO] ), "pct", "0.0%", "brl", "R$ #,0", "num0", "#,0", "num1", "#,0.0", "num3", "0.000", "#,0.0" )
+
+	/// P75 das operadoras do ranking com o mesmo porte da escolhida. Reclamações só entre as com 20 mil clientes ou mais; glosa sem os valores improváveis.
+	measure 'P75 do porte' =
+			VAR _codigo = SELECTEDVALUE ( dIndicador[CODIGO] )
+			VAR _porte = SELECTEDVALUE ( dOperadora[PORTE] )
+			VAR _grupo =
+			    FILTER ( ALL ( dOperadora ), dOperadora[PORTE] = _porte && dOperadora[RANKING_OK] = TRUE () )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( _porte ),
+			        SWITCH (
+			            _codigo,
+			            "sinistralidade", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sinistralidade] ) ), dOperadora[sinistralidade], 0.75 ),
+			            "indice_combinado", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[indice_combinado] ) ), dOperadora[indice_combinado], 0.75 ),
+			            "margem_liquida", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[margem_liquida] ) ), dOperadora[margem_liquida], 0.75 ),
+			            "indice_desp_adm", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[indice_desp_adm] ) ), dOperadora[indice_desp_adm], 0.75 ),
+			            "receita_vida_mes", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[receita_vida_mes] ) ), dOperadora[receita_vida_mes], 0.75 ),
+			            "custo_vida_mes", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[custo_vida_mes] ) ), dOperadora[custo_vida_mes], 0.75 ),
+			            "cresc_vidas_12m", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[cresc_vidas_12m] ) ), dOperadora[cresc_vidas_12m], 0.75 ),
+			            "pct_59mais", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_59mais] ) ), dOperadora[pct_59mais], 0.75 ),
+			            "igr_12m", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[igr_12m] ) && dOperadora[vidas_mh] >= 20000 ), dOperadora[igr_12m], 0.75 ),
+			            "idss", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[idss] ) ), dOperadora[idss], 0.75 ),
+			            "glosa_inicial", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[glosa_inicial] ) && NOT dOperadora[flag_glosa] ), dOperadora[glosa_inicial], 0.75 ),
+			            "tempo_pagamento_dias", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[tempo_pagamento_dias] ) ), dOperadora[tempo_pagamento_dias], 0.75 ),
+			            "sus_falha_por_mil", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sus_falha_por_mil] ) ), dOperadora[sus_falha_por_mil], 0.75 ),
+			            "sus_pct_justica", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[sus_pct_justica] ) ), dOperadora[sus_pct_justica], 0.75 ),
+			            "pct_judicial", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_judicial] ) ), dOperadora[pct_judicial], 0.75 ),
+			            "pct_ev_rede_propria", PERCENTILEX.INC ( FILTER ( _grupo, NOT ISBLANK ( dOperadora[pct_ev_rede_propria] ) ), dOperadora[pct_ev_rede_propria], 0.75 )
+			        )
+			    )
+		displayFolder: 5. Ficha
+		lineageTag: 7c2a9deb-4fcd-5ffb-abb5-21699e5b44cb
+
+		formatStringDefinition = SWITCH ( SELECTEDVALUE ( dIndicador[FORMATO] ), "pct", "0.0%", "brl", "R$ #,0", "num0", "#,0", "num1", "#,0.0", "num3", "0.000", "#,0.0" )
+
+	/// Onde a operadora fica entre as do mesmo porte. 'Melhor/pior' só aparece quando o indicador tem direção clara.
+	measure 'Posição no porte' =
+			VAR _v = [Valor da operadora]
+			VAR _p25 = [P25 do porte]
+			VAR _p75 = [P75 do porte]
+			VAR _melhor = SELECTEDVALUE ( dIndicador[MELHOR] )
+			VAR _faixa =
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _v ) || ISBLANK ( _p25 ), BLANK (),
+			        _v < _p25, "entre as 25% mais baixas",
+			        _v > _p75, "entre as 25% mais altas",
+			        "na faixa do meio"
+			    )
+			VAR _juizo =
+			    SWITCH (
+			        TRUE (),
+			        _melhor = "menor" && _v < _p25, " (melhor)",
+			        _melhor = "menor" && _v > _p75, " (pior)",
+			        _melhor = "maior" && _v > _p75, " (melhor)",
+			        _melhor = "maior" && _v < _p25, " (pior)",
+			        ""
+			    )
+			RETURN
+			    IF ( NOT ISBLANK ( _faixa ) && SELECTEDVALUE ( dOperadora[RANKING_OK] ), _faixa & _juizo )
+		displayFolder: 5. Ficha
+		lineageTag: 65a51028-647c-52fa-8e5f-d963c99f62b1
+
+	column CODIGO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CODIGO
+		lineageTag: cf472927-e671-563e-909c-b1ae2795077b
+
+		annotation SummarizationSetBy = Automatic
+
+	column INDICADOR
+		dataType: string
+		summarizeBy: none
+		sourceColumn: INDICADOR
+		lineageTag: f8108b22-185a-53ce-aa22-08434f060fe5
+		sortByColumn: ORDEM
+
+		annotation SummarizationSetBy = Automatic
+
+	column COMO_CALCULA
+		dataType: string
+		summarizeBy: none
+		sourceColumn: COMO_CALCULA
+		lineageTag: 808d272b-59e8-508c-a0e6-49e4ac17d6c9
+
+		annotation SummarizationSetBy = Automatic
+
+	column FORMATO
+		dataType: string
+		summarizeBy: none
+		sourceColumn: FORMATO
+		lineageTag: 85b9ed37-50bc-5f25-93fd-5ba6d11f7e07
+
+		annotation SummarizationSetBy = Automatic
+
+	column MELHOR
+		dataType: string
+		summarizeBy: none
+		sourceColumn: MELHOR
+		lineageTag: 88225fd9-0fae-5537-ad89-61060ebc7659
+
+		annotation SummarizationSetBy = Automatic
+
+	column ORDEM
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ORDEM
+		lineageTag: 17b82b4c-1299-54ed-9027-5fc6864e3d23
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dIndicador = m
+		mode: import
+		source =
+				let
+				    Fonte = Parquet.Document ( File.Contents ( PastaDados & "dIndicador.parquet" ) )
+				in
+				    Fonte

@@ -47,4 +47,4 @@ Link direto para uma ficha: `#operadora/<registro ANS>` (ex.: `#operadora/326305
 - `sloplint`: 0 falha; os mesmos 2 avisos registrados.
 
 ## Falta
-- Link "Quem fez" no rodapé, à espera do LinkedIn.
+- Domínio mapa.feliperodrigues.cloud (DNS na Hostinger + serviço no EasyPanel). O rodapé já aponta para o LinkedIn (16/11).

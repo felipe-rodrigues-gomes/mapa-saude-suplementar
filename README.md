@@ -124,4 +124,4 @@ Os arquivos brutos e intermediários (`dados/brutos`, `dados/tratados`) não est
 
 ---
 
-Projeto independente, sem vínculo com a ANS nem com qualquer operadora. Feito por **Felipe Rodrigues**, economista e analista de BI em saúde suplementar. Código sob licença MIT; dados de fontes públicas, citadas acima.
+Projeto independente, sem vínculo com a ANS nem com qualquer operadora. Feito por **[Felipe Rodrigues Gomes](https://www.linkedin.com/in/feliperodriguesgomes/)**, economista e analista de BI em saúde suplementar. Código sob licença MIT; dados de fontes públicas, citadas acima.

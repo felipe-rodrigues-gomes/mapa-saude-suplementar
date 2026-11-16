@@ -201,6 +201,7 @@ async function responder(q) {
       r.texto = `Preço de tabela ${noUF(uf)} para ${quem}: os menores são ` + com.slice(0, 3).map((o) => `<strong>${esc(o.nome)}</strong> (${reais(precoDe(o))})`).join(", ") + `. O preço do meio, entre ${com.length} operadoras, é ${reais(mediana)}.`;
     }
     r.texto += " É o valor informado à ANS para planos à venda, não o que cada cliente paga.";
+    if (!intent.contratacao || !intent.acomodacao) r.texto += ` Para outro perfil, pergunte com o tipo: individual, empresarial ou por adesão; enfermaria ou apartamento.`;
     r.links.push([`#compare/${uf}${ops.length ? "/" + ops.map((o) => o.reg).join(",") : ""}`, "Ver no comparador"]);
     return r;
   }

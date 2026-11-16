@@ -78,8 +78,28 @@ def quadro(g):
 
 
 por_mod = {m: quadro(g) for m, g in rk.groupby("MODALIDADE")}
+# capítulo 1: para onde vão os R$ 100 (12 meses até 2026T2, médico-hospitalares)
+# 12m = acumulado 2026T2 + ano 2025 fechado − acumulado 2025T2, conta a conta
+def _contas(z):
+    x = ler_zip_csv(BRUTOS / "contabeis" / f"{z}.zip")
+    x["REG"] = reg(x.REG_ANS)
+    x = x[x.REG.isin(set(dim[dim.SEGMENTO == "MH"].REG)) & x.CD_CONTA_CONTABIL.isin(["31", "32", "33", "34", "37", "41", "43", "44", "46", "35", "45", "36", "47", "61", "3", "4"])]
+    return x.assign(v=num_br(x.VL_SALDO_FINAL)).groupby("CD_CONTA_CONTABIL").v.sum()
+
+
+_s = _contas("2T2026") + _contas("4T2025") - _contas("2T2025")
+_base = _s["31"] + _s["32"]          # contraprestações efetivas: o que os clientes pagaram, líquido de tributos diretos
+_p = {"atendimento": _s["41"], "administracao": _s["46"], "venda": _s["43"],
+      "outras": _s["44"] - (_s["33"] + _s["34"] + _s["37"])}
+_p["sobra"] = _base - sum(_p.values())
+cada100 = {k: v / _base * 100 for k, v in _p.items()}
+cada100.update({"aplicacoes": (_s["35"] - _s["45"]) / _base * 100, "patrimonial": (_s["36"] - _s["47"]) / _base * 100,
+                "impostos": _s["61"] / _base * 100, "lucro": (_s["3"] - _s["4"] - _s["61"]) / _base * 100,
+                "receita_bi": _base / 1e9})
+print("cada R$ 100:", {k: round(v, 2) for k, v in cada100.items()})
+
 mercado = {
-    "atualizado": "15/11/2026", "periodo_contabil": "12 meses até jun/2026",
+    "atualizado": "16/11/2026", "periodo_contabil": "12 meses até jun/2026", "cada100": cada100,
     "anos": anos,
     "acumulado": {k: sum(a[k] for a in anos) for k in ("operacao", "aplicacoes", "lucro")},
     "operadoras_ranking": int(len(rk)),

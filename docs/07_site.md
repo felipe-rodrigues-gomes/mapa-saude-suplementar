@@ -35,6 +35,16 @@ Link direto para uma ficha: `#operadora/<registro ANS>` (ex.: `#operadora/326305
 - Navegador: 1280×800 e 375×812 (celular), sem rolagem lateral, sem erro no console, busca por teclado ("unimed fortal" → ficha), âncoras do menu no lugar certo.
 - Verificador de design (Hallmark `sloplint`): 0 falha; 2 avisos registrados no topo do `site.css` (volume de texto de um site de dados; contraste de texto sobre o verde, que não existe na página).
 
+## v2 (16/11/2026)
+- **Estado global:** um `select[data-estado]` no topo e outro na abertura; `setEstado(uf)` avisa todos os capítulos (painel do estado, ranking de reclamações, comparador). Guardado em `localStorage` (`mapa.uf`), com SP como padrão.
+- **Dados por estado:** `dados/uf/XX.json` (15 KB a 450 KB; SP é o maior, ~80 KB comprimido) só carrega quando o estado é escolhido.
+- **Ranking de reclamações** em HTML, não SVG: texto selecionável e legível no celular; cada linha é um link para o comparador já com a operadora escolhida.
+- **Comparador:** tabela com largura fixa por coluna; no celular, a coluna do indicador fica parada enquanto as operadoras rolam para o lado. Marca de melhor da linha só quando o indicador tem direção clara, comparando o valor como aparece na tela (empate de arredondamento marca as duas).
+- **Rolagem por link:** sem animação e conferida de novo depois que os dados chegam, porque o conteúdo acima ainda pode empurrar a página.
+
+## Verificação (16/11/2026)
+- 1280×800 e 375×812: sem rolagem lateral, sem erro no console; troca de estado pelo mapa e pelo topo; troca de concorrente (inverte quando escolhe uma já escolhida); links `#compare/CE/317144` e `#reclamacoes/BA` param na seção certa.
+- `sloplint`: 0 falha; os mesmos 2 avisos registrados.
+
 ## Falta
-- Links do rodapé "Código no GitHub" e "Quem fez" apontam para `#`, à espera do endereço do repositório e do seu LinkedIn.
-- Publicação no GitHub Pages (etapa 6, junto com o README).
+- Link "Quem fez" no rodapé, à espera do LinkedIn.

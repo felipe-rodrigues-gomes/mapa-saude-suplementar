@@ -1,7 +1,7 @@
 # Mapa da saúde suplementar
 
 **Os dados públicos da ANS sobre planos de saúde, organizados para ler.**
-Resultado, sinistralidade, clientes, qualidade, uso do SUS e a ficha de cada uma das 682 operadoras médicas ativas, comparada com as do mesmo porte.
+Quanto da mensalidade volta em atendimento, de onde vem o lucro, quem mais gera reclamação no seu estado e como a sua operadora se compara às concorrentes: as 682 operadoras médicas ativas, com dados abertos da ANS e do IBGE.
 
 **[Abrir o site](https://felipe-rodrigues-gomes.github.io/mapa-saude-suplementar/)** · abre no celular, sem login · [ficha da operadora, exemplo](https://felipe-rodrigues-gomes.github.io/mapa-saude-suplementar/#operadora/326305)
 
@@ -25,12 +25,15 @@ R$ bilhões, operadoras médico-hospitalares. Aplicar as reservas faz parte do n
 
 ## O que tem no site
 
-- **Resultado:** operação × aplicações × lucro, ano a ano.
-- **Quanto da mensalidade volta em atendimento:** sinistralidade em 12 meses móveis, por modalidade, e ranking dentro do mesmo porte, filtrável por modalidade e estado.
-- **Clientes:** cobertura por estado e por município (clientes ÷ população do IBGE), concentração do mercado e a queda do plano individual.
-- **Custo × qualidade:** gastar mais com o cliente não reduz reclamação (correlação praticamente nula).
-- **SUS:** quando o cliente de plano vai ao SUS, nem sempre é falha da operadora. Os atendimentos foram separados em três leituras (não indica falha, zona cinzenta, provável falha de acesso).
-- **Ficha da operadora:** 16 indicadores, cada um com a faixa das operadoras do mesmo porte.
+O leitor escolhe o estado logo na abertura e a página inteira passa a falar dele, em cinco capítulos curtos:
+
+1. **Seus R$ 100:** de cada R$ 100 de mensalidade, R$ 81,76 voltam em atendimento e sobram R$ 2,69 para a operadora.
+2. **O lucro:** operação × aplicações × lucro, ano a ano.
+3. **Quem paga:** cobertura por estado e por município (clientes ÷ população do IBGE), concentração do mercado e a queda do plano individual.
+4. **Reclamações:** reclamações na ANS a cada mil clientes, por operadora, no estado do leitor, contra a média do estado; quanto cada uma resolveu na mediação e do que mais se reclama.
+5. **Compare:** a sua operadora contra até três concorrentes do mesmo estado, de qualquer porte: clientes, reclamações, hospitais na rede, preço de tabela, ida ao SUS, sinistralidade, nota da ANS, prazo de pagamento à rede. Abre a ficha completa, com 16 indicadores comparados às operadoras do mesmo porte.
+
+Cada tela tem link próprio, para mandar no WhatsApp: `#reclamacoes/CE`, `#compare/CE/317144,368253`, `#operadora/317144`.
 
 ![Ficha da operadora](docs/img/ficha.png)
 
@@ -61,6 +64,8 @@ Sinistralidade = (Eventos indenizáveis líquidos + |Corresponsabilidade cedida|
 5. **Ressarcimento ao SUS:** as cobranças de acompanhamento pós-transplante praticamente somem a partir de 2024 (de ~45 mil para ~1,9 mil por ano).
 6. **Glosa improvável:** 15% das operadoras informam glosa abaixo de 0,05%, e uma das maiores informou 99%. Ficam marcadas e fora das comparações de glosa.
 7. **O dicionário do IGR descreve errado** o denominador do índice (diz "beneficiários que reclamaram"; é a carteira inteira).
+8. **A base aberta de taxa de resolutividade parou em out/2019.** Aqui, a resolução é recalculada a partir das reclamações (NIP) com a fórmula da ficha técnica da ANS; o total de reclamações bate com o IGR (correlação 1,0 por operadora).
+9. **O arquivo da rede hospitalar usa compressão deflate64** (2,1 GB, 26 GB descompactado), que bibliotecas comuns não abrem; é lido pelo `unzip`, um estado por vez.
 
 ## Como foi feito
 
@@ -98,7 +103,10 @@ python -I scripts/etl_ibge.py
 python -I scripts/etl_cadastro.py
 python -I scripts/validar.py                  # confere com a ANS
 python -I scripts/indicadores.py
+python -I scripts/etl_nip.py                  # reclamações por operadora e estado
+python -I scripts/etl_preco_rede.py           # preço de tabela e hospitais na rede
 python -I scripts/exportar_site.py            # site/dados
+python -I scripts/exportar_uf.py              # site/dados/uf: um arquivo por estado
 python -I scripts/exportar_pbi.py && python -I scripts/gerar_pbip.py && python -I scripts/gerar_paginas.py
 ```
 
@@ -109,7 +117,10 @@ Os arquivos brutos e intermediários (`dados/brutos`, `dados/tratados`) não est
 - A contabilidade é nacional por operadora: o filtro de estado mostra as operadoras com clientes no estado, não uma sinistralidade do estado.
 - Uso do SUS mede só internações e tratamentos de alto custo identificados pela ANS; consulta, exame simples e pronto-socorro sem internação não aparecem.
 - A ANS não informa grupo econômico: cada registro na ANS é uma operadora.
-- Dados atualizados em 15/11/2026: contabilidade e clientes até jun/2026, reclamações até jun/2026, IDSS 2025 (ano-base 2024), glosa até o 2º semestre de 2025.
+- Reclamações por mil clientes oscilam em carteiras pequenas: o ranking só mostra operadoras com 20 mil clientes ou mais no estado. Mais reclamação pode vir de carteira mais velha ou de mais plano individual; o número mostra onde olhar, não o veredito.
+- Preço de tabela é o valor comercial médio informado à ANS para os planos à venda (mediana por operadora e estado), não o que cada cliente paga.
+- Hospitais na rede contam estabelecimentos ligados a pelo menos um plano ativo da operadora no estado; não medem qualidade nem acesso efetivo.
+- Dados atualizados em 16/11/2026: contabilidade e clientes até jun/2026, reclamações de jul/2025 a jun/2026, preço de tabela de jun/2026, IDSS 2025 (ano-base 2024), glosa até o 2º semestre de 2025.
 
 ---
 

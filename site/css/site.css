@@ -193,9 +193,11 @@ strong { font-weight: 600; color: var(--color-ink); }
 @media (max-width: 60rem) {
   .abertura-grade, .grade-2, .ficha-topo, .ficha-grade, .rodape-grade { grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
   .grade-3 { grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
-  .menu li { display: none; }
-  .menu li:has(a[href="#operadora"]) { display: list-item; }
-  .menu a[href="#operadora"] { color: var(--color-ink); font-weight: 600; }
+  .topo nav { display: none; }
+  .topo-linha { gap: var(--space-sm); }
+  .estado-topo { min-width: 0; }
+  .estado-topo select { width: 8rem; max-width: 100%; }
+  .tabela-conferencia th, .tabela-conferencia td { white-space: normal; }
   .abertura { padding-block: var(--space-xl) var(--space-2xl); }
 }
 @media (max-width: 40rem) {
@@ -210,4 +212,113 @@ strong { font-weight: 600; color: var(--color-ink); }
   .g-rotulo { font-size: 21px; }
   .ficha .g-eixo, .ficha .g-rotulo-fraco { font-size: 15px; }
   .ficha .g-rotulo { font-size: 16px; }
+}
+
+/* ================= v2: narrativa em capítulos, reclamações e comparador ================= */
+.estado-topo select { padding: var(--space-2xs) var(--space-sm); border: var(--rule-hair) solid var(--color-ink-2); border-radius: var(--radius-card); background: var(--color-paper-3); color: var(--color-ink); font-weight: 600; cursor: pointer; }
+.estado-topo select:hover { border-color: var(--color-ink); }
+.estado-topo select:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.menu a[aria-current="true"] { color: var(--color-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 0.3em; }
+
+.escolha { margin-top: var(--space-xl); max-width: 520px; }
+.escolha label { display: block; font-weight: 600; margin-bottom: var(--space-xs); }
+.escolha select { flex: 1; min-width: 0; padding: var(--space-sm) var(--space-md); border: 1.5px solid var(--color-ink-2); border-radius: var(--radius-card); background: var(--color-paper-3); color: var(--color-ink); cursor: pointer; }
+.escolha select:hover { border-color: var(--color-ink); }
+.escolha select:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.escolha .nota { margin-top: var(--space-xs); }
+a.botao { display: inline-flex; align-items: center; text-decoration: none; }
+
+.nota-cem { margin: 0; display: grid; gap: var(--space-md); }
+.nota-cem-pergunta { font-size: var(--text-xl); font-weight: 800; color: var(--color-ink); letter-spacing: -0.01em; }
+
+/* barra dos R$ 100: uma linha, cada fatia proporcional ao valor */
+.cem { display: flex; height: 56px; border-radius: var(--radius-card); overflow: hidden; background: var(--color-rule); }
+.cem-grande { height: 88px; margin-top: var(--space-xl); }
+.cem span { display: flex; align-items: center; justify-content: center; min-width: 0; color: var(--color-paper-3); font-weight: 800; font-variant-numeric: tabular-nums; font-size: var(--text-sm); white-space: nowrap; overflow: hidden; }
+.cem-grande span { font-size: var(--text-lg); }
+.cem .f-atendimento { background: var(--color-ink); }
+.cem .f-administracao { background: var(--color-ink-2); }
+.cem .f-venda { background: var(--color-quiet); color: var(--color-ink); }
+.cem .f-outras { background: var(--color-rule); color: var(--color-ink); }
+.cem .f-sobra { background: var(--color-mark); color: var(--color-ink); }
+.cem-legenda { list-style: none; margin: var(--space-lg) 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-md); }
+.cem-legenda li { display: grid; gap: var(--space-3xs); border-top: 3px solid var(--color-rule); padding-top: var(--space-sm); }
+.cem-legenda li.l-atendimento { border-color: var(--color-ink); }
+.cem-legenda li.l-administracao { border-color: var(--color-ink-2); }
+.cem-legenda li.l-venda { border-color: var(--color-quiet); }
+.cem-legenda li.l-sobra { border-color: var(--color-mark); }
+.cem-legenda strong { font-size: var(--text-xl); font-weight: 800; font-variant-numeric: tabular-nums; }
+.cem-legenda span { font-size: var(--text-sm); color: var(--color-ink-2); }
+
+.capitulo { position: relative; }
+.cap-num { font-size: clamp(3.5rem, 6vw + 1rem, 6rem); font-weight: 800; line-height: 0.8; color: var(--color-rule); margin-bottom: var(--space-md); font-variant-numeric: tabular-nums; }
+.secao-papel2 .cap-num { color: var(--color-paper-3); }
+.capitulo > .container > h2 { max-width: 22ch; }
+.capitulo > .container > .lead { margin-top: var(--space-lg); }
+.ponte { margin-top: var(--space-2xl); font-size: var(--text-lead); color: var(--color-ink-2); max-width: 60ch; }
+.ponte a { color: var(--color-ink); font-weight: 600; }
+.ponte a:hover { color: var(--color-accent-text); }
+.ponte a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.placar-lado { border-top: var(--rule-hair) solid var(--color-ink); padding-top: var(--space-md); }
+.placar-lado .placar-num { font-size: clamp(2.5rem, 4vw + 0.5rem, 3.75rem); }
+
+/* ranking de reclamações: barras em HTML (texto selecionável e legível no celular) */
+.ranking-rec { display: grid; gap: var(--space-2xs); }
+.rec-linha { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr) 92px; gap: var(--space-sm); align-items: center; padding: var(--space-xs) var(--space-2xs); border-radius: var(--radius-card); text-decoration: none; color: inherit; }
+.rec-linha:hover { background: color-mix(in oklab, var(--color-paper-3) 80%, transparent); }
+.rec-linha:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
+.rec-linha[aria-current="true"] { background: var(--color-paper-3); box-shadow: inset 3px 0 0 var(--color-mark); }
+.rec-nome { font-size: var(--text-sm); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rec-nome small { display: block; font-weight: 400; color: var(--color-muted); font-size: var(--text-xs); }
+.rec-barra { position: relative; height: 18px; }
+.rec-barra i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--color-loss); border-radius: 0 2px 2px 0; }
+.rec-barra b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--color-ink); }
+.rec-valor { text-align: right; font-variant-numeric: tabular-nums; font-weight: 800; }
+.rec-valor small { display: block; font-weight: 400; font-size: var(--text-xs); color: var(--color-muted); }
+.rec-media { font-size: var(--text-xs); color: var(--color-muted); margin-top: var(--space-sm); }
+.numeros-rec { margin-top: var(--space-3xl); }
+.tema-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2xs); }
+.tema-lista li { display: flex; justify-content: space-between; gap: var(--space-md); font-size: var(--text-sm); border-bottom: var(--rule-hair) solid var(--color-rule); padding-block: var(--space-2xs); }
+.tema-lista li span:last-child { font-variant-numeric: tabular-nums; color: var(--color-muted); }
+
+/* comparador */
+.comparar-escolha { display: flex; flex-wrap: wrap; gap: var(--space-md); margin-top: var(--space-xl); align-items: end; }
+.comparar-escolha label { display: grid; gap: var(--space-2xs); font-size: var(--text-sm); color: var(--color-muted); }
+.comparar-escolha select { padding: var(--space-xs) var(--space-sm); border: var(--rule-hair) solid var(--color-ink-2); border-radius: var(--radius-card); background: var(--color-paper-3); color: var(--color-ink); min-width: 220px; max-width: 300px; cursor: pointer; }
+.comparar-escolha select:hover { border-color: var(--color-ink); }
+.comparar-escolha select:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.comparar-escolha .principal select { border-width: 2px; border-color: var(--color-ink); font-weight: 600; }
+.tabela-comparar { margin-top: var(--space-lg); }
+.tabela-comparar { table-layout: fixed; min-width: 760px; }
+.tabela-comparar th { white-space: normal; vertical-align: bottom; }
+.tabela-comparar td { white-space: normal; }
+.tabela-comparar th.t-nome { width: 26%; }
+.tabela-comparar th.sua { background: var(--color-paper-2); box-shadow: inset 0 3px 0 var(--color-mark); }
+.tabela-comparar td.sua { background: color-mix(in oklab, var(--color-paper-2) 60%, transparent); }
+.tabela-comparar td.t-ind { max-width: none; overflow: visible; }
+.tabela-comparar td.t-ind small { display: block; color: var(--color-muted); font-size: var(--text-xs); }
+.tabela-comparar tr.bloco td { background: none; padding-top: var(--space-lg); font-weight: 800; color: var(--color-ink); border-bottom: 1.5px solid var(--color-ink-2); }
+.tabela-comparar td.melhor { color: var(--color-accent-text); font-weight: 800; }
+.tabela-comparar td.melhor::after { content: " \2713"; }
+.preco-filtros { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-sm); }
+.preco-filtros select { padding: var(--space-2xs) var(--space-xs); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-paper-3); color: var(--color-ink); font-size: var(--text-xs); cursor: pointer; }
+.preco-filtros select:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.ficha-ancora { margin-top: var(--space-3xl); padding-top: var(--space-2xl); border-top: var(--rule-hair) solid var(--color-rule); }
+
+@media (max-width: 60rem) {
+  .estado-topo { margin-left: auto; }
+  .cem-legenda { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cem span { font-size: var(--text-xs); }
+}
+@media (max-width: 40rem) {
+  .rec-linha { grid-template-columns: minmax(0, 1fr) 80px; }
+  .rec-barra { grid-column: 1 / -1; grid-row: 2; }
+  .comparar-escolha select { min-width: 0; width: 100%; max-width: none; }
+  .comparar-escolha label { width: 100%; }
+  .cem-grande { height: 64px; }
+  .cem-grande span:not(.f-atendimento) { font-size: 0; }
+  .tabela-comparar { min-width: 600px; }
+  .tabela-comparar tr.bloco span { position: sticky; left: var(--space-sm); }
+  .tabela-comparar th.t-nome { width: 30%; }
+  .tabela-comparar th.t-nome, .tabela-comparar td.t-ind { position: sticky; left: 0; z-index: 1; background: var(--color-paper); box-shadow: 1px 0 0 var(--color-rule); }
 }

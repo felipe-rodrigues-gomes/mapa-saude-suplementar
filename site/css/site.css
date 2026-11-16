@@ -95,6 +95,8 @@ strong { font-weight: 600; color: var(--color-ink); }
 .g-eixo { fill: var(--color-muted); font-size: 12px; font-family: var(--font-body); font-variant-numeric: tabular-nums; }
 .g-rotulo { fill: var(--color-ink); font-size: 12px; font-weight: 600; font-family: var(--font-body); font-variant-numeric: tabular-nums; }
 .g-rotulo-fraco { fill: var(--color-muted); font-size: 12px; font-family: var(--font-body); }
+/* capítulo 2: rótulos por cima da linha, com contorno da cor do fundo para não colarem nela */
+#lucro .g-rotulo, #lucro .g-rotulo-fraco { paint-order: stroke; stroke: var(--color-paper-2); stroke-width: 4px; stroke-linejoin: round; }
 .g-perda { fill: var(--color-loss); }
 .g-ganho { fill: var(--color-accent); }
 .g-linha { fill: none; stroke: var(--color-ink); stroke-width: 2.5; stroke-linejoin: round; }

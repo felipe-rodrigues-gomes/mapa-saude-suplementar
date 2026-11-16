@@ -121,18 +121,31 @@ function graficoAnos(m) {
     texto(s, ml - 6, y(v) + 4, v === 0 ? "0" : sinal(v, 0), "g-eixo", "end");
   }
   const banda = (W - ml - mr) / m.anos.length, bw = Math.min(24, banda / 4);
-  const pts = [];
+  // no celular o SVG encolhe e a fonte cresce em unidades do desenho (até 21): as caixas usam o pior caso
+  const fs = 22, caixa = (x, base, txt) => ({ x0: x - txt.length * fs * 0.28, x1: x + txt.length * fs * 0.28, y0: base - fs * 0.8, y1: base + fs * 0.2 });
+  const bate = (p, q) => p.x0 < q.x1 && q.x0 < p.x1 && p.y0 < q.y1 && q.y0 < p.y1;
+  const pts = [], rotulosBarras = [];
   m.anos.forEach((a, i) => {
-    const cx = ml + banda * (i + 0.5);
+    const cx = ml + banda * (i + 0.5), ocupadas = [];
     [[a.operacao, "g-perda", -bw - 2], [a.aplicacoes, "g-ganho", 2]].forEach(([v, cls, dx]) => {
       el("rect", { x: cx + dx, y: y(Math.max(0, v)), width: bw, height: Math.max(1, Math.abs(y(v) - y(0))), class: cls, rx: 2 }, s);
-      texto(s, cx + dx + bw / 2, v >= 0 ? y(v) - 6 : y(v) + 14, sinal(v), "g-rotulo-fraco");
+      const tx = cx + dx + bw / 2, base = v >= 0 ? y(v) - 6 : y(v) + 14 + (fs - 12) * 0.6;
+      rotulosBarras.push(texto(s, tx, base, sinal(v), "g-rotulo-fraco"));
+      ocupadas.push(caixa(tx, base, sinal(v)));
     });
     texto(s, cx, H - 8, a.ano, "g-eixo");
-    pts.push([cx, y(a.lucro), a.lucro]);
+    pts.push([cx, y(a.lucro), a.lucro, ocupadas]);
   });
   el("path", { d: "M" + pts.map((p) => p.slice(0, 2).join(",")).join("L"), class: "g-linha" }, s);
-  pts.forEach(([x, yy, v]) => { el("circle", { cx: x, cy: yy, r: 4, class: "g-ponto" }, s); texto(s, x, yy - 10, nf(1).format(v), "g-rotulo"); });
+  pts.forEach(([x, yy, v, ocupadas]) => {
+    el("circle", { cx: x, cy: yy, r: 4, class: "g-ponto" }, s);
+    // o rótulo do lucro vai acima do ponto; se bater num rótulo de barra: acima à esquerda, abaixo ou à esquerda
+    const txt = nf(1).format(v), largura = txt.length * fs * 0.56;
+    const opcoes = [[x, yy - 10, "middle"], [x - 6, yy - 14, "end"], [x, yy + fs + 6, "middle"], [x - 12, yy + fs * 0.35, "end"]];
+    const livre = opcoes.find(([ox, oy, anc]) => { const cxo = anc === "end" ? ox - largura / 2 : ox; return !ocupadas.some((o) => bate(caixa(cxo, oy, txt), o)); }) || opcoes[0];
+    texto(s, livre[0], livre[1], txt, "g-rotulo", livre[2]);
+  });
+  rotulosBarras.forEach((r) => s.appendChild(r)); // por cima da linha e dos pontos
   $('[data-tabela="anos"]').insertAdjacentHTML("beforeend", "<thead><tr><th>Ano</th><th>Operação</th><th>Aplicações</th><th>Lucro</th></tr></thead><tbody>" +
     m.anos.map((a) => `<tr><td>${a.ano}</td><td>${sinal(a.operacao)}</td><td>${sinal(a.aplicacoes)}</td><td>${sinal(a.lucro)}</td></tr>`).join("") + "</tbody>");
 }

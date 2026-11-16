@@ -95,13 +95,14 @@ function cem(m, cu, uf) {
   barra($("[data-cem]"), true);
   $("[data-cem-legenda]").innerHTML = fatias.map(([k, t]) => `<li class="l-${k}"><strong class="num">${real(Math.abs(R[k]))}</strong><span>${t} (${nf(1).format(Math.abs(d[k]))}%)</span></li>`).join("");
   $("[data-cem]").setAttribute("aria-label", `Divisão da mensalidade média ${onde}, de ${real(mens)}`);
-  $("[data-cem-valor]").textContent = `Média ${onde}: ${real(mens)} por mês.`;
+  const br = cu[uf] ? ` No Brasil, ${real(cu.BR.mensalidade)}.` : "";
+  $("[data-cem-valor]").textContent = `Média ${onde}: ${real(mens)} por mês.${br}`;
   $("[data-cem-lucro]").textContent = `Mas o lucro das operadoras ${onde} foi de ${bi(d.lucro_bi)}.`;
   $("[data-cem-figura]").setAttribute("aria-label", `Mensalidade média ${onde}: ${real(mens)}. ${nf(1).format(d.atendimento)}% voltam em atendimento. O lucro das operadoras ${onde} foi de ${bi(d.lucro_bi)} em 12 meses`);
   $("[data-cem-titulo]").textContent = d.sobra >= 0
     ? `${Onde}, a mensalidade média é de ${real(mens)}. Sobram ${real(R.sobra)} para a operadora.`
     : `${Onde}, a mensalidade média é de ${real(mens)}, e a operação perde ${real(-R.sobra)} por cliente.`;
-  $("[data-cem-lead]").textContent = `É a média de todos os planos médicos ${onde}, empresariais incluídos: ${bi(d.receita_bi)} de mensalidades em 12 meses. ${d.sobra >= 0 ? `Os ${real(R.sobra)} são o que fica` : "O resultado é o que fica"} depois de pagar atendimento, administração, venda e as demais despesas da operação.`;
+  $("[data-cem-lead]").textContent = `É a média de todos os planos médicos ${onde}, empresariais incluídos: ${bi(d.receita_bi)} de mensalidades em 12 meses.${cu[uf] ? ` A média no Brasil é de ${real(cu.BR.mensalidade)} por mês.` : ""} ${d.sobra >= 0 ? `Os ${real(R.sobra)} são o que fica` : "O resultado é o que fica"} depois de pagar atendimento, administração, venda e as demais despesas da operação.`;
   $("[data-cem-ponte]").textContent = `${d.sobra >= 0 ? `Na operação, sobraram ${bi(d.sobra_bi)}.` : `Na operação, faltaram ${bi(-d.sobra_bi)}.`} Mas o lucro das operadoras ${onde} foi de ${bi(d.lucro_bi)}.`;
 }
 

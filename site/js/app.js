@@ -79,15 +79,30 @@ function ligarEstados() {
 }
 
 // ---------------------------------------------------------------- capítulo 1: pra onde vai a mensalidade (em %)
-function cem(m) {
-  const c = m.cada100;
-  const fatias = [["atendimento", "voltam em atendimento"], ["administracao", "administração"], ["venda", "venda e corretagem"], ["outras", "outras despesas da operação"], ["sobra", "sobram para a operadora"]];
+function cem(m, cu, uf) {
+  const d = cu[uf] || cu.BR, onde = cu[uf] ? noUF(uf) : "no Brasil", Onde = onde[0].toUpperCase() + onde.slice(1);
+  const mens = d.mensalidade, rs = (p) => mens * p / 100;
+  const real = (v) => `R$\u00a0${nf(0).format(v)}`;
+  const bi = (v) => Math.abs(v) >= 1 ? `R$\u00a0${nf(1).format(v)}\u00a0${Math.abs(v) < 2 ? "bilhão" : "bilhões"}` : `R$\u00a0${nf(0).format(v * 1000)}\u00a0milhões`;
+  const fatias = [["atendimento", "voltam em atendimento"], ["administracao", "administração"], ["venda", "venda e corretagem"], ["outras", "outras despesas da operação"], ["sobra", d.sobra >= 0 ? "sobram para a operadora" : "a operação perde"]];
+  // valores em reais inteiros que somam exatamente a mensalidade arredondada (a diferença vai para o atendimento)
+  const R = Object.fromEntries(fatias.map(([k]) => [k, Math.round(rs(d[k]))]));
+  R.atendimento += Math.round(mens) - fatias.reduce((s, [k]) => s + R[k], 0);
   const barra = (alvo, rotulos) => {
-    alvo.innerHTML = fatias.map(([k, t]) => `<span class="f-${k}" style="flex:${c[k].toFixed(2)} 1 0" title="${nf(1).format(c[k])}%: ${t}">${rotulos && c[k] >= 6 ? nf(1).format(c[k]) + "%" : ""}</span>`).join("");
+    alvo.innerHTML = fatias.map(([k, t]) => `<span class="f-${k}" style="flex:${Math.max(d[k], 0).toFixed(2)} 1 0" title="${real(Math.abs(R[k]))} (${nf(1).format(d[k])}%): ${t}">${rotulos && d[k] >= 6 ? real(R[k]) : ""}</span>`).join("");
   };
   barra($("[data-cem-mini]"), false);
   barra($("[data-cem]"), true);
-  $("[data-cem-legenda]").innerHTML = fatias.map(([k, t]) => `<li class="l-${k}"><strong class="num">${nf(1).format(c[k])}%</strong><span>${t}</span></li>`).join("");
+  $("[data-cem-legenda]").innerHTML = fatias.map(([k, t]) => `<li class="l-${k}"><strong class="num">${real(Math.abs(R[k]))}</strong><span>${t} (${nf(1).format(Math.abs(d[k]))}%)</span></li>`).join("");
+  $("[data-cem]").setAttribute("aria-label", `Divisão da mensalidade média ${onde}, de ${real(mens)}`);
+  $("[data-cem-valor]").textContent = `Média ${onde}: ${real(mens)} por mês.`;
+  $("[data-cem-lucro]").textContent = `Mas o lucro das operadoras ${onde} foi de ${bi(d.lucro_bi)}.`;
+  $("[data-cem-figura]").setAttribute("aria-label", `Mensalidade média ${onde}: ${real(mens)}. ${nf(1).format(d.atendimento)}% voltam em atendimento. O lucro das operadoras ${onde} foi de ${bi(d.lucro_bi)} em 12 meses`);
+  $("[data-cem-titulo]").textContent = d.sobra >= 0
+    ? `${Onde}, a mensalidade média é de ${real(mens)}. Sobram ${real(R.sobra)} para a operadora.`
+    : `${Onde}, a mensalidade média é de ${real(mens)}, e a operação perde ${real(-R.sobra)} por cliente.`;
+  $("[data-cem-lead]").textContent = `É a média de todos os planos médicos ${onde}, empresariais incluídos: ${bi(d.receita_bi)} de mensalidades em 12 meses. ${d.sobra >= 0 ? `Os ${real(R.sobra)} são o que fica` : "O resultado é o que fica"} depois de pagar atendimento, administração, venda e as demais despesas da operação.`;
+  $("[data-cem-ponte]").textContent = `${d.sobra >= 0 ? `Na operação, sobraram ${bi(d.sobra_bi)}.` : `Na operação, faltaram ${bi(-d.sobra_bi)}.`} Mas o lucro das operadoras ${onde} foi de ${bi(d.lucro_bi)}.`;
 }
 
 // ---------------------------------------------------------------- capítulo 2: resultado ano a ano
@@ -126,18 +141,29 @@ function corCobertura(v) {
 }
 function painelUF(c, uf) {
   const u = c.ufs[uf]; if (!u) return;
-  const conc = u.hhi > 2500 ? "muito concentrado" : u.hhi > 1500 ? "concentrado" : "pouco concentrado";
   $("[data-painel-uf]").innerHTML = `<dl>
       <dt>Com plano médico</dt><dd>${pct(u.cobertura)} da população</dd>
       <dt>Clientes</dt><dd>${mil(u.vidas)}</dd>
       <dt>Desde dez/2021</dt><dd>${sinal(u.cresc * 100)}%</dd>
-      <dt>Maior operadora</dt><dd>${esc(u.lider)}, com ${pct(u.lider_pct, 0)} dos clientes</dd>
-      <dt>Mercado</dt><dd>${conc}: as 3 maiores têm ${pct(u.top3_pct, 0)}</dd>
     </dl>`;
   const t = $('[data-uf-titulo="clientes"]'), f = $('[data-uf-frase="clientes"]');
   t.textContent = `${noUF(uf).replace(/^./, (x) => x.toUpperCase())}, ${pct(u.cobertura, 0)} da população tem plano médico.`;
   f.textContent = `No Brasil, são ${pct(c.brasil.cobertura, 0)}: ${nf(1).format(c.brasil.vidas / 1e6)} milhões de pessoas. Toque em outro estado no mapa para comparar.`;
   $$(".mapa path").forEach((e) => e.setAttribute("aria-pressed", e.dataset.uf === uf ? "true" : "false"));
+}
+// participação de mercado no estado: as 6 maiores e o resto somado; cada linha abre o comparador
+async function participacao(c, uf) {
+  const d = await dados(`uf/${uf}`); if (uf !== UF) return;
+  const ops = [...d.operadoras].sort((a, b) => b.vidas - a.vidas), top = ops.slice(0, 6);
+  // "outras" = o que falta para 100% depois de arredondar as 6 maiores, para a soma da tela fechar
+  const resto = Math.max(0, 1000 - top.reduce((s, o) => s + Math.round(o.participacao * 1000), 0)) / 1000, n = (d.operadoras_com_clientes ?? ops.length) - top.length;
+  const linha = (nome, p, href) => `<${href ? `a href="${href}"` : "div"} class="share-linha"><span class="share-nome">${nome}</span><span class="share-barra"><i style="width:${(p * 100).toFixed(1)}%"></i></span><span class="share-valor num">${pct(p)}</span></${href ? "a" : "div"}>`;
+  $("[data-share-titulo]").textContent = `Participação de mercado ${noUF(uf)}`;
+  $("[data-share]").innerHTML = top.map((o) => linha(esc(o.nome), o.participacao, `#compare/${uf}/${o.reg}`)).join("") +
+    (n > 0 && resto > 0.0005 ? linha(`Outras ${nf(0).format(n)} operadoras`, resto, null) : "");
+  const hhi = ops.reduce((s, o) => s + (o.participacao * 100) ** 2, 0), top3 = ops.slice(0, 3).reduce((s, o) => s + o.participacao, 0);
+  const conc = hhi > 2500 ? "muito concentrado" : hhi > 1500 ? "concentrado" : "pouco concentrado";
+  $("[data-share-nota]").textContent = `Mercado ${conc}: as 3 maiores têm ${pct(top3, 0)} dos ${mil(d.clientes)} clientes, em jun/2026. Toque numa operadora para compará-la.`;
 }
 function graficoMapa(c) {
   const { largura: W, altura: H, caminhos } = c.mapa;
@@ -244,7 +270,7 @@ async function reclamacoes(uf) {
 const LINHAS = [
   ["bloco", "No estado"],
   ["vidas", "Clientes no estado", (o) => o.vidas, (v) => mil(v), ""],
-  ["participacao", "Parte do mercado do estado", (o) => o.participacao, (v) => pct(v), ""],
+  ["participacao", "Participação de mercado no estado", (o) => o.participacao, (v) => pct(v), ""],
   ["cresc_12m", "Crescimento de clientes em 12 meses", (o) => o.cresc_12m, (v) => (v == null ? "—" : sinal(v * 100) + "%"), "maior"],
   ["rec_por_mil", "Reclamações por mil clientes, por ano", (o) => o.rec_por_mil, (v) => num(v, 1), "menor", "NIP/ANS, jul/2025 a jun/2026; oscila em carteiras pequenas"],
   ["resolvidas", "Reclamações resolvidas na mediação", (o) => o.resolvidas, (v) => pct(v, 0), "maior", "Fórmula da ANS"],
@@ -454,10 +480,10 @@ function rota() {
   if (/^#(reclamacoes|compare|operadora)\//.test(location.hash)) history.scrollRestoration = "manual";
   ligarEstados();
   capituloAtual();
-  const [m, c] = await Promise.all([dados("mercado"), dados("clientes")]);
-  cem(m); graficoAnos(m); graficoMapa(c); graficoContratacao(c); ligarCidade();
+  const [m, c, cu] = await Promise.all([dados("mercado"), dados("clientes"), dados("cada_uf")]);
+  graficoAnos(m); graficoMapa(c); graficoContratacao(c); ligarCidade();
   quandoMudarEstado((uf) => {
-    painelUF(c, uf); reclamacoes(uf);
+    cem(m, cu, uf); painelUF(c, uf); participacao(c, uf); reclamacoes(uf);
     // trocou de estado: a "sua operadora" fica, se atuar lá; as concorrentes passam a ser as do novo estado
     comparador(uf, LISTA_DA_ROTA || (SELECAO ? SELECAO.slice(0, 1) : null));
     LISTA_DA_ROTA = null;

@@ -54,10 +54,11 @@
         <p class="nota">Dados públicos da ANS e do IBGE. Leva uns cinco minutos.</p>
       </form>
     </div>
-    <figure class="nota-cem" aria-label="Da mensalidade, 81,8% voltam em atendimento e 2,7% sobram da operação. O lucro das operadoras foi de R$ 22,1 bilhões em 12 meses">
+    <figure class="nota-cem" data-cem-figura aria-label="Da mensalidade, 81,8% voltam em atendimento e 2,7% sobram da operação. O lucro das operadoras foi de R$ 22,1 bilhões em 12 meses">
       <p class="nota-cem-pergunta">Pra onde vai a sua mensalidade?</p>
+      <p class="nota-cem-valor" data-cem-valor>Média no Brasil: R$&nbsp;555 por mês.</p>
       <div class="cem" data-cem-mini aria-hidden="true"></div>
-      <p class="nota-cem-lucro">Mas o lucro das operadoras foi de R$&nbsp;22,1&nbsp;bilhões.</p>
+      <p class="nota-cem-lucro" data-cem-lucro>Mas o lucro das operadoras foi de R$&nbsp;22,1&nbsp;bilhões.</p>
       <figcaption class="nota">Planos médico-hospitalares, 12 meses até jun/2026.</figcaption>
     </figure>
   </div>
@@ -67,11 +68,12 @@
 <section class="secao capitulo" id="mensalidade" aria-labelledby="t-cap1">
   <div class="container">
     <p class="cap-num" aria-hidden="true">1</p>
-    <h2 id="t-cap1">Da sua mensalidade, só 2,7% sobram para a operadora.</h2>
-    <p class="lead">É o que fica para a operadora depois de pagar atendimento, administração, venda e as demais despesas da operação. No mercado inteiro, foram R$&nbsp;348 bilhões de mensalidades em 12 meses.</p>
+    <h2 id="t-cap1" data-cem-titulo>Da sua mensalidade, só 2,7% sobram para a operadora.</h2>
+    <p class="lead" data-cem-lead>É o que fica para a operadora depois de pagar atendimento, administração, venda e as demais despesas da operação. No mercado inteiro, foram R$&nbsp;348 bilhões de mensalidades em 12 meses.</p>
     <div class="cem cem-grande" data-cem role="img" aria-label="Divisão da mensalidade, em percentual"></div>
     <ul class="cem-legenda" data-cem-legenda></ul>
-    <p class="ponte">Na operação, sobraram R$&nbsp;9,4&nbsp;bilhões. Mas o lucro das operadoras foi de R$&nbsp;22,1&nbsp;bilhões. <a href="#lucro">De onde veio a diferença?</a></p>
+    <p class="nota cem-nota">A ANS publica as contas por operadora, não por estado. Para o estado, cada conta de cada operadora é repartida pela parte dos clientes dela que mora lá. Planos médico-hospitalares, 12 meses até jun/2026.</p>
+    <p class="ponte"><span data-cem-ponte>Na operação, sobraram R$&nbsp;9,4&nbsp;bilhões. Mas o lucro das operadoras foi de R$&nbsp;22,1&nbsp;bilhões.</span> <a href="#lucro">De onde veio a diferença?</a></p>
   </div>
 </section>
 
@@ -123,10 +125,17 @@
           <p class="resposta-cidade" data-cidade-resposta aria-live="polite"></p>
         </form>
       </div>
-      <figure class="mapa" aria-label="Parte da população com plano médico em cada estado">
-        <div class="svg-alvo" data-grafico="mapa"></div>
-        <div class="escala" aria-hidden="true"><span>5%</span><span class="escala-barra"></span><span>40%</span></div>
-      </figure>
+      <div class="mapa-lado">
+        <figure class="mapa" aria-label="Parte da população com plano médico em cada estado">
+          <div class="svg-alvo" data-grafico="mapa"></div>
+          <div class="escala" aria-hidden="true"><span>5%</span><span class="escala-barra"></span><span>40%</span></div>
+        </figure>
+        <figure class="share">
+          <figcaption class="share-titulo" data-share-titulo>Participação de mercado</figcaption>
+          <div class="share-lista" data-share></div>
+          <p class="nota" data-share-nota></p>
+        </figure>
+      </div>
     </div>
     <div class="grade-2 grade-baixa">
       <div class="secao-texto">

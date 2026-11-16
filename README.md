@@ -27,9 +27,9 @@ R$ bilhões, operadoras médico-hospitalares. Aplicar as reservas faz parte do n
 
 O leitor escolhe o estado logo na abertura e a página inteira passa a falar dele, em cinco capítulos curtos:
 
-1. **Sua mensalidade:** 81,8% voltam em atendimento e 2,7% sobram para a operadora; mesmo assim, o lucro das operadoras foi de R$ 22,1 bilhões em 12 meses.
+1. **Sua mensalidade:** a mensalidade média do estado escolhido e quanto dela vai para atendimento, administração, venda e outras despesas, e quanto sobra. No Brasil, R$ 555 por mês: 81,8% voltam em atendimento e 2,7% sobram da operação; mesmo assim, o lucro das operadoras foi de R$ 22,1 bilhões em 12 meses. No Ceará, R$ 499, e um lucro estimado em R$ 467 milhões com os clientes do estado.
 2. **O lucro:** operação × aplicações × lucro, ano a ano.
-3. **Quem paga:** cobertura por estado e por município (clientes ÷ população do IBGE), concentração do mercado e a queda do plano individual.
+3. **Quem paga:** cobertura por estado e por município (clientes ÷ população do IBGE), participação de mercado das maiores operadoras do estado e a queda do plano individual.
 4. **Reclamações:** reclamações na ANS a cada mil clientes, por operadora, no estado do leitor, contra a média do estado; quanto cada uma resolveu na mediação e do que mais se reclama.
 5. **Compare:** a sua operadora contra até três concorrentes do mesmo estado, de qualquer porte: clientes, reclamações, hospitais na rede, preço de tabela, ida ao SUS, sinistralidade, nota da ANS, prazo de pagamento à rede. Abre a ficha completa, com 16 indicadores comparados às operadoras do mesmo porte.
 
@@ -107,6 +107,7 @@ python -I scripts/etl_nip.py                  # reclamações por operadora e es
 python -I scripts/etl_preco_rede.py           # preço de tabela e hospitais na rede
 python -I scripts/exportar_site.py            # site/dados
 python -I scripts/exportar_uf.py              # site/dados/uf: um arquivo por estado
+python -I scripts/exportar_cada_uf.py         # capítulo 1 por estado: mensalidade média, destino e lucro
 python -I scripts/exportar_pbi.py && python -I scripts/gerar_pbip.py && python -I scripts/gerar_paginas.py
 ```
 
@@ -115,6 +116,7 @@ Os arquivos brutos e intermediários (`dados/brutos`, `dados/tratados`) não est
 ## Limites
 
 - A contabilidade é nacional por operadora: o filtro de estado mostra as operadoras com clientes no estado, não uma sinistralidade do estado.
+- Mensalidade média, destino da mensalidade e lucro por estado são estimativas: cada conta de cada operadora é repartida entre os estados pela parte dos clientes de plano médico que ela tem em cada um. Uma operadora nacional leva para o estado a sua média nacional, o que pesa em estados pequenos (em Roraima, R$ 976). Somados, os 27 estados dão o total do Brasil.
 - Uso do SUS mede só internações e tratamentos de alto custo identificados pela ANS; consulta, exame simples e pronto-socorro sem internação não aparecem.
 - A ANS não informa grupo econômico: cada registro na ANS é uma operadora.
 - Reclamações por mil clientes oscilam em carteiras pequenas: o ranking só mostra operadoras com 20 mil clientes ou mais no estado. Mais reclamação pode vir de carteira mais velha ou de mais plano individual; o número mostra onde olhar, não o veredito.

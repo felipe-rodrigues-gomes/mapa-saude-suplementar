@@ -33,6 +33,8 @@ O leitor escolhe o estado logo na abertura e a página inteira passa a falar del
 4. **Reclamações:** reclamações na ANS a cada mil clientes, por operadora, no estado do leitor, contra a média do estado; quanto cada uma resolveu na mediação e do que mais se reclama.
 5. **Compare:** a sua operadora contra até três concorrentes do mesmo estado, de qualquer porte: clientes, reclamações, hospitais na rede, preço de tabela, ida ao SUS, sinistralidade, nota da ANS, prazo de pagamento à rede. Abre a ficha completa, com 16 indicadores comparados às operadoras do mesmo porte e de onde vem o lucro: operação do plano, aplicações e outros resultados, com uma frase que diz qual pesou mais.
 
+**Pergunte ao mapa:** um botão flutuante responde perguntas em português ("a Unimed Fortaleza reclama mais que a Hapvida?", "quanto custa um plano para 40 anos?"). A IA, um modelo gratuito, só entende a pergunta; os números saem dos mesmos dados das telas, com link para elas. A IA não escreve número nenhum, então a resposta e a tela nunca discordam. Sem a IA, uma leitura por palavras-chave responde as perguntas mais comuns. Método em [docs/09_assistente.md](docs/09_assistente.md).
+
 Cada tela tem link próprio, para mandar no WhatsApp: `#reclamacoes/CE`, `#compare/CE/317144,368253`, `#operadora/317144`.
 
 ![Ficha da operadora](docs/img/ficha.png)
@@ -115,6 +117,7 @@ Os arquivos brutos e intermediários (`dados/brutos`, `dados/tratados`) não est
 
 ## Limites
 
+- O assistente responde só o que o site mostra; perguntas sobre contrato, cobertura ou um caso pessoal são encaminhadas à operadora ou à ANS.
 - A contabilidade é nacional por operadora: o filtro de estado mostra as operadoras com clientes no estado, não uma sinistralidade do estado.
 - Mensalidade média, destino da mensalidade e lucro por estado são estimativas: cada conta de cada operadora é repartida entre os estados pela parte dos clientes de plano médico que ela tem em cada um. Uma operadora nacional leva para o estado a sua média nacional, o que pesa em estados pequenos (em Roraima, R$ 976). Somados, os 27 estados dão o total do Brasil.
 - Uso do SUS mede só internações e tratamentos de alto custo identificados pela ANS; consulta, exame simples e pronto-socorro sem internação não aparecem.

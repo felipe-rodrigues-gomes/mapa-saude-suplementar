@@ -230,6 +230,7 @@ a.botao { display: inline-flex; align-items: center; text-decoration: none; }
 
 .nota-cem { margin: 0; display: grid; gap: var(--space-md); }
 .nota-cem-pergunta { font-size: var(--text-xl); font-weight: 800; color: var(--color-ink); letter-spacing: -0.01em; }
+.nota-cem-lucro { margin: 0; font-size: var(--text-lg); font-weight: 800; color: var(--color-ink); }
 
 /* barra dos R$ 100: uma linha, cada fatia proporcional ao valor */
 .cem { display: flex; height: 56px; border-radius: var(--radius-card); overflow: hidden; background: var(--color-rule); }

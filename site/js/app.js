@@ -78,16 +78,16 @@ function ligarEstados() {
   $$("[data-estado]").forEach((s) => { s.innerHTML = ops; s.value = UF; s.addEventListener("change", () => setEstado(s.value)); });
 }
 
-// ---------------------------------------------------------------- capítulo 1: os R$ 100
+// ---------------------------------------------------------------- capítulo 1: pra onde vai a mensalidade (em %)
 function cem(m) {
   const c = m.cada100;
   const fatias = [["atendimento", "voltam em atendimento"], ["administracao", "administração"], ["venda", "venda e corretagem"], ["outras", "outras despesas da operação"], ["sobra", "sobram para a operadora"]];
   const barra = (alvo, rotulos) => {
-    alvo.innerHTML = fatias.map(([k, t]) => `<span class="f-${k}" style="flex:${c[k].toFixed(2)} 1 0" title="R$ ${nf(2).format(c[k])}: ${t}">${rotulos && c[k] >= 6 ? "R$ " + nf(2).format(c[k]) : ""}</span>`).join("");
+    alvo.innerHTML = fatias.map(([k, t]) => `<span class="f-${k}" style="flex:${c[k].toFixed(2)} 1 0" title="${nf(1).format(c[k])}%: ${t}">${rotulos && c[k] >= 6 ? nf(1).format(c[k]) + "%" : ""}</span>`).join("");
   };
   barra($("[data-cem-mini]"), false);
   barra($("[data-cem]"), true);
-  $("[data-cem-legenda]").innerHTML = fatias.map(([k, t]) => `<li class="l-${k}"><strong class="num">R$ ${nf(2).format(c[k])}</strong><span>${t}</span></li>`).join("");
+  $("[data-cem-legenda]").innerHTML = fatias.map(([k, t]) => `<li class="l-${k}"><strong class="num">${nf(1).format(c[k])}%</strong><span>${t}</span></li>`).join("");
 }
 
 // ---------------------------------------------------------------- capítulo 2: resultado ano a ano

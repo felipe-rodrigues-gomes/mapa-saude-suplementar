@@ -27,7 +27,7 @@ R$ bilhões, operadoras médico-hospitalares. Aplicar as reservas faz parte do n
 
 O leitor escolhe o estado logo na abertura e a página inteira passa a falar dele, em cinco capítulos curtos:
 
-1. **Seus R$ 100:** de cada R$ 100 de mensalidade, R$ 81,76 voltam em atendimento e sobram R$ 2,69 para a operadora.
+1. **Sua mensalidade:** 81,8% voltam em atendimento e 2,7% sobram para a operadora; mesmo assim, o lucro das operadoras foi de R$ 22,1 bilhões em 12 meses.
 2. **O lucro:** operação × aplicações × lucro, ano a ano.
 3. **Quem paga:** cobertura por estado e por município (clientes ÷ população do IBGE), concentração do mercado e a queda do plano individual.
 4. **Reclamações:** reclamações na ANS a cada mil clientes, por operadora, no estado do leitor, contra a média do estado; quanto cada uma resolveu na mediação e do que mais se reclama.

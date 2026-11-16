@@ -340,7 +340,8 @@ async function comparador(uf, pedido) {
   $$("[data-ficha-de]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); abrirFicha(a.dataset.fichaDe, true); }));
   DESTAQUE = sel[0];
   $$(".rec-linha").forEach((a) => a.setAttribute("aria-current", a.dataset.reg === DESTAQUE ? "true" : "false"));
-  abrirFicha(sel[0], false);
+  // com #operadora/REG no endereço, a ficha é a do link: o comparador (que termina depois) não a troca
+  if (!/^#operadora\//.test(location.hash)) abrirFicha(sel[0], false);
 }
 
 // ---------------------------------------------------------------- ficha completa (operadora inteira)
@@ -404,6 +405,31 @@ function sparkSinist(o, d) {
     ${med ? `<line x1="${ml}" x2="${W - mr}" y1="${y(med)}" y2="${y(med)}" class="g-mediana" stroke-dasharray="4 3"/><text x="${W - mr}" y="${y(med) - 4}" class="g-rotulo-fraco" text-anchor="end">mediana do porte hoje</text>` : ""}
     <path d="M${pts.join("L")}" class="g-linha"/>${anos}</svg>`;
 }
+// ficha: de onde vem o lucro. Operação + aplicações + outros (patrimonial, menos impostos) = lucro líquido
+function origemLucro(r, fmtMi) {
+  const { operacao: op, aplicacoes: ap, lucro: lu } = r;
+  if (op == null || ap == null || lu == null) return `<p class="nota">Sem demonstração contábil recente.</p>`;
+  const ou = Math.round((lu - op - ap) * 10) / 10;
+  const em = (v) => { const a = Math.abs(v); return a >= 1000 ? `R$\u00a0${nf(1).format(a / 1000)}\u00a0${a < 2000 ? "bilhão" : "bilhões"}` : `R$\u00a0${nf(a < 10 ? 1 : 0).format(a)}\u00a0${a < 2 ? "milhão" : "milhões"}`; };
+  let frase;
+  if (lu >= 0 && op < 0) frase = `A operação do plano deu prejuízo de ${em(op)}. O lucro veio de fora dela${ap > 0 ? ", das aplicações" : ""}${ou > 0 ? (ap > 0 ? " e de outros resultados" : ", de outros resultados") : ""}.`;
+  else if (lu >= 0 && ap <= 0) frase = "O lucro vem da operação do plano.";
+  else if (lu >= 0) {
+    const s = op / (op + ap);
+    frase = s >= 0.6 ? `O lucro vem principalmente da operação do plano: ${pct(s, 0)} do que a operação e as aplicações somaram.`
+      : s <= 0.4 ? `O lucro vem principalmente das aplicações: ${pct(1 - s, 0)} do que a operação e as aplicações somaram.`
+      : `O lucro vem das duas fontes em partes parecidas: ${pct(s, 0)} da operação e ${pct(1 - s, 0)} das aplicações.`;
+  } else if (op < 0) frase = ap > 0 ? `A operação do plano deu prejuízo de ${em(op)}, e as aplicações (${em(ap)}) não cobriram.` : "A operação do plano e as aplicações deram prejuízo.";
+  else frase = `A operação do plano deu lucro, mas o resultado final foi prejuízo de ${em(lu)}.`;
+  if (lu > 0 && ou > 0 && ou >= 0.25 * lu) frase += ` Outros resultados, como participação em outras empresas, somaram mais ${em(ou)}.`;
+  const linhas = [["Operação do plano", op, ""], ["Aplicações", ap, ""], ["Outros resultados e impostos", ou, "como participação em outras empresas, menos impostos"], ["Lucro líquido", lu, "total"]];
+  const vs = linhas.map((l) => l[1]), lo = Math.min(0, ...vs), hi = Math.max(0, ...vs), amp = hi - lo || 1;
+  const pos = (v) => ((v - lo) / amp * 100).toFixed(1);
+  return `<p class="origem-frase">${frase}</p><div class="origem" role="list">` + linhas.map(([nome, v, nota]) =>
+    `<div class="origem-linha${nota === "total" ? " origem-total" : ""}" role="listitem"><span class="origem-nome">${nome}${nota && nota !== "total" ? `<small>${nota}</small>` : ""}</span>` +
+    `<span class="origem-barra"><b style="left:${pos(0)}%"></b><i class="${v < 0 ? "neg" : nota === "total" ? "tot" : "pos"}" style="left:${pos(Math.min(0, v))}%;width:${(Math.abs(v) / amp * 100).toFixed(1)}%"></i></span>` +
+    `<span class="origem-valor num">${fmtMi(v)}</span></div>`).join("") + `</div><p class="nota">Em reais. A soma das três primeiras linhas dá o lucro líquido.</p>`;
+}
 async function abrirFicha(reg, rolar = true) {
   const d = await operadoras();
   const o = d.operadoras.find((x) => x.reg === reg);
@@ -417,7 +443,7 @@ async function abrirFicha(reg, rolar = true) {
   }).join("");
   const rede = Object.entries(o.rede).filter(([, v]) => v > 0.005).sort((a, b) => b[1] - a[1]);
   const r = o.resultado;
-  const fmtMi = (v) => (v == null ? "—" : Math.abs(v) >= 1000 ? sinal(v / 1000, 1) + " bi" : sinal(v, 0) + " mi");
+  const fmtMi = (v) => (v == null ? "—" : Math.abs(v) >= 1000 ? sinal(v / 1000, 1) + " bi" : Math.abs(v) < 10 ? sinal(v, 1) + " mi" : sinal(v, 0) + " mi");
   alvo.innerHTML = `
     <header class="ficha-cabeca">
       <h3>${esc(o.nome)}</h3>
@@ -430,12 +456,7 @@ async function abrirFicha(reg, rolar = true) {
         <p class="faixa-legenda">Faixa cinza: metade do meio das operadoras do mesmo porte no Brasil; traço: mediana; ponto: a operadora. Verde e coral só quando o indicador tem direção clara.</p>
       </div>
       <div class="ficha-lado">
-        <div><h4>Resultado em 12 meses (R$)</h4>
-          <div class="resultado-op">
-            <div><span class="num">${fmtMi(r.operacao)}</span><span>operação do plano</span></div>
-            <div><span class="num">${fmtMi(r.aplicacoes)}</span><span>aplicações</span></div>
-            <div><span class="num">${fmtMi(r.lucro)}</span><span>lucro líquido</span></div>
-          </div></div>
+        <div><h4>De onde vem o lucro (12 meses)</h4>${origemLucro(r, fmtMi)}</div>
         <div><h4>Quanto da mensalidade volta em atendimento</h4>${sparkSinist(o, d)}</div>
         <div><h4>Como paga a rede</h4><div class="svg-alvo" data-rede></div></div>
         <div><h4>Onde estão os clientes</h4><p>${Object.entries(o.ufs).slice(0, 6).map(([u, v]) => `${NOMES_UF[u] || u} ${mil(v)}`).join("; ") || "—"}.</p></div>

@@ -31,7 +31,7 @@ O leitor escolhe o estado logo na abertura e a página inteira passa a falar del
 2. **O lucro:** operação × aplicações × lucro, ano a ano.
 3. **Quem paga:** cobertura por estado e por município (clientes ÷ população do IBGE), participação de mercado das maiores operadoras do estado e a queda do plano individual.
 4. **Reclamações:** reclamações na ANS a cada mil clientes, por operadora, no estado do leitor, contra a média do estado; quanto cada uma resolveu na mediação e do que mais se reclama.
-5. **Compare:** a sua operadora contra até três concorrentes do mesmo estado, de qualquer porte: clientes, reclamações, hospitais na rede, preço de tabela, ida ao SUS, sinistralidade, nota da ANS, prazo de pagamento à rede. Abre a ficha completa, com 16 indicadores comparados às operadoras do mesmo porte.
+5. **Compare:** a sua operadora contra até três concorrentes do mesmo estado, de qualquer porte: clientes, reclamações, hospitais na rede, preço de tabela, ida ao SUS, sinistralidade, nota da ANS, prazo de pagamento à rede. Abre a ficha completa, com 16 indicadores comparados às operadoras do mesmo porte e de onde vem o lucro: operação do plano, aplicações e outros resultados, com uma frase que diz qual pesou mais.
 
 Cada tela tem link próprio, para mandar no WhatsApp: `#reclamacoes/CE`, `#compare/CE/317144,368253`, `#operadora/317144`.
 

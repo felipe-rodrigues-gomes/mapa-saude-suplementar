@@ -1,0 +1,6 @@
+.git
+.venv
+dados/
+powerbi/
+scripts/
+docs/

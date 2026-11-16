@@ -522,7 +522,7 @@ function contarVisita() {
     fetch("api/visita", { method: "POST", headers: { "content-type": "application/json" }, keepalive: true,
       body: JSON.stringify({ o: q.get("o") || "", ref: document.referrer || "" }) }).catch(() => {});
     const vistos = new Set(), t0 = Date.now();
-    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) vistos.add(e.target.id); }), { threshold: 0.35 });
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) vistos.add(e.target.id); }), { rootMargin: "-45% 0px -45% 0px" }); // conta quando o capítulo passa pelo meio da tela (vale para capítulos mais altos que a tela)
     $$("#inicio, section.capitulo[id], #operadora, #metodo").forEach((s) => io.observe(s));
     let enviado = false;
     const sair = () => {

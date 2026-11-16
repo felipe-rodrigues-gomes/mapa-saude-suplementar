@@ -31,7 +31,9 @@ const fichas = (nome) => norm(nome).split(" ").filter((t) => t && !VAZIAS.has(t)
 // mencionada pelo usuário (texto livre) -> operadora de uma lista, a maior quando houver empate
 function acharPorMencao(mencao, lista) {
   const m = fichas(mencao); if (!m.length) return null;
-  const cands = lista.filter((o) => { const t = fichas(o.nome); return m.every((p) => t.some((x) => x.startsWith(p))); });
+  // palavra a palavra ("unimed fortaleza") ou tudo junto ("sulamerica" = "sul america", "notredame")
+  const junto = m.join("");
+  const cands = lista.filter((o) => { const t = fichas(o.nome); return m.every((p) => t.some((x) => x.startsWith(p))) || (junto.length >= 4 && t.join("").includes(junto)); });
   return cands.sort((a, b) => (b.vidas || 0) - (a.vidas || 0))[0] || null;
 }
 // leitura local: quais operadoras da lista aparecem na pergunta
@@ -43,7 +45,7 @@ function acharNaPergunta(q, lista) {
   for (const o of lista) {
     const t = fichas(o.nome); if (!t.length) continue;
     const precisa = GENERICAS.has(t[0]) && t[1] ? t.slice(0, 2) : t.slice(0, 1);
-    if (!precisa.every((p) => qt.has(p))) continue;
+    if (!precisa.every((p) => qt.has(p)) && !qt.has(precisa.join(""))) continue;
     const ponto = t.filter((p) => qt.has(p)).length, chave = precisa.join(" "), atual = porChave.get(chave);
     if (!atual || ponto > atual.ponto || (ponto === atual.ponto && (o.vidas || 0) > (atual.o.vidas || 0))) porChave.set(chave, { o, ponto });
   }
@@ -304,4 +306,4 @@ function montar() {
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", montar); else montar();
 // para testes no console
-window.__mapaIA = { responder, lerLocal };
+window.__mapaIA = { responder, lerLocal, acharPorMencao };

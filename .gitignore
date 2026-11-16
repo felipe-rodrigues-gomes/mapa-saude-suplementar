@@ -8,3 +8,6 @@ powerbi/**/.pbi/cache.abf
 powerbi/**/.pbi/localSettings.json
 dados/tratados/
 .hallmark/
+
+# rascunhos pessoais (post, roteiro): fora do repositório público
+_privado/

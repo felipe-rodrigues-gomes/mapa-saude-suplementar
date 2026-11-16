@@ -3,9 +3,18 @@
 **Os dados públicos da ANS sobre planos de saúde, organizados para ler.**
 Quanto da mensalidade volta em atendimento, de onde vem o lucro, quem mais gera reclamação no seu estado e como a sua operadora se compara às concorrentes: as 682 operadoras médicas ativas, com dados abertos da ANS e do IBGE.
 
-**[Abrir o site](https://mapa.feliperodrigues.cloud/)** · abre no celular, sem login · [ficha da operadora, exemplo](https://mapa.feliperodrigues.cloud/#operadora/326305) · cópia no [GitHub Pages](https://felipe-rodrigues-gomes.github.io/mapa-saude-suplementar/)
+**[Abrir o site](https://mapa.feliperodrigues.cloud/)** · abre no celular, sem login · [ficha da operadora, exemplo](https://mapa.feliperodrigues.cloud/#operadora/326305) · cópia no [GitHub Pages](https://felipe-rodrigues-gomes.github.io/mapa-saude-suplementar/) · [English summary](#english-summary)
 
-![Abertura do site: o lucro vem das aplicações](docs/img/abertura.png)
+![Abertura do site: o leitor escolhe o estado e vê para onde vai a mensalidade](docs/img/v2_abertura.png)
+
+## Em 30 segundos
+
+- **O que é:** um site público que explica o mercado de planos de saúde com os dados abertos da ANS, do jeito que um leigo entende, e um assistente que responde perguntas em português.
+- **Volume:** cerca de 8 GB de beneficiários, 5,6 GB de ressarcimento ao SUS, 2,1 GB de rede hospitalar (26 GB descompactados) e 22 trimestres contábeis, tratados em Python até virar 3 MB de dados para o site.
+- **Validação:** os indicadores batem com os painéis oficiais da ANS (sinistralidade de 2024 a 2026 com diferença de até 0,1 p.p.; lucro do setor igual ao da ANS, em bilhões com uma casa). [Tabela de conferência](#os-números-conferem-com-a-ans).
+- **Qualidade de dado:** [9 problemas encontrados nas bases da ANS](#problemas-encontrados-nos-dados-da-ans), documentados e contornados, como uma base de resolução de reclamações parada em 2019.
+- **Ferramentas:** Python (pandas, pyarrow), Power BI (projeto PBIP com modelo em TMDL e 37 medidas DAX), HTML, CSS e JavaScript sem framework com gráficos em SVG à mão, Node com um modelo de IA gratuito, Docker e nginx.
+- **Decisões que defendo:** a IA do assistente não escreve número, só entende a pergunta; as estimativas por estado somam exatamente o total do Brasil; o ranking de reclamações só entra com carteira de 20 mil clientes ou mais.
 
 ## O achado
 
@@ -19,9 +28,9 @@ De 2021 a 2025, a operação dos planos médicos (mensalidades menos atendimento
 | 2024 | +4,2 | +8,4 | 10,3 |
 | 2025 | +9,7 | +14,6 | 23,4 |
 
-R$ bilhões, operadoras médico-hospitalares. Aplicar as reservas faz parte do negócio (a ANS exige que as operadoras guardem dinheiro para pagar atendimentos já feitos); o que surpreende é a proporção. Hoje, **1 em cada 5 operadoras** só fecha no lucro por causa das aplicações.
+R$ bilhões, operadoras médico-hospitalares. Aplicar as reservas faz parte do negócio: a ANS exige que as operadoras guardem dinheiro para pagar atendimentos já feitos. O quadro mudou em 2024 e 2025, quando a operação voltou ao azul (+R$ 4,2 bi e +R$ 9,7 bi), mas as aplicações seguem rendendo mais, com a Selic acima de 13% ao ano. Hoje, **1 em cada 5 operadoras** só fecha no lucro por causa das aplicações.
 
-![Resultado ano a ano](docs/img/resultado.png)
+![Capítulo 2: operação, aplicações e lucro, ano a ano](docs/img/v2_lucro.png)
 
 ## O que tem no site
 
@@ -37,7 +46,17 @@ O leitor escolhe o estado logo na abertura e a página inteira passa a falar del
 
 Cada tela tem link próprio, para mandar no WhatsApp: `#reclamacoes/CE`, `#compare/CE/317144,368253`, `#operadora/317144`.
 
-![Ficha da operadora](docs/img/ficha.png)
+| Sua mensalidade (Ceará) | Reclamações por mil clientes |
+|---|---|
+| ![Capítulo 1: a mensalidade média do Ceará e para onde ela vai](docs/img/v2_mensalidade.png) | ![Capítulo 4: ranking de reclamações no Ceará](docs/img/v2_reclamacoes.png) |
+| **Pergunte ao mapa** | **Ficha da operadora** |
+| ![Assistente respondendo com os números do site](docs/img/v2_assistente.png) | ![Ficha completa com 16 indicadores e de onde vem o lucro](docs/img/v2_ficha.png) |
+
+<details><summary>Comparador completo (imagem longa)</summary>
+
+![Capítulo 5: a operadora contra três concorrentes do mesmo estado](docs/img/v2_comparador.png)
+
+</details>
 
 ## Os números conferem com a ANS
 
@@ -126,6 +145,18 @@ Os arquivos brutos e intermediários (`dados/brutos`, `dados/tratados`) não est
 - Preço de tabela é o valor comercial médio informado à ANS para os planos à venda (mediana por operadora e estado), não o que cada cliente paga.
 - Hospitais na rede contam estabelecimentos ligados a pelo menos um plano ativo da operadora no estado; não medem qualidade nem acesso efetivo.
 - Dados atualizados em 16/11/2026: contabilidade e clientes até jun/2026, reclamações de jul/2025 a jun/2026, preço de tabela de jun/2026, IDSS 2025 (ano-base 2024), glosa até o 2º semestre de 2025.
+
+## English summary
+
+**Brazilian private health insurance, explained with open data.** A public website that turns the open data of ANS, Brazil's health insurance regulator, into a story anyone can read: where the monthly fee goes, where insurers' profits come from, who gets the most complaints in each state, and how any insurer compares with its local competitors.
+
+- **Main finding:** from 2021 to 2025, the insurance operation itself lost R$ 3.6 billion, while financial income on reserves earned R$ 48.1 billion. Operations turned profitable again in 2024 and 2025, but with Brazil's policy rate above 13%, investments still earn more than the core business.
+- **Data engineering:** about 8 GB of enrollment data, 5.6 GB of public-health reimbursement records, a 2.1 GB provider-network file (26 GB uncompressed) and 22 quarters of financial statements, processed in Python (pandas, pyarrow) and validated against ANS's official dashboards (loss ratio within 0.1 p.p. for 2024 to 2026). Nine data-quality problems in the official sources are documented and handled.
+- **Front end:** plain HTML, CSS and JavaScript with hand-drawn SVG charts, mobile first, every screen personalized by the reader's state.
+- **AI assistant:** a free LLM (Gemini) only classifies the question into a closed schema; every number in the answer comes from the same data as the charts, so the assistant cannot invent figures. It falls back to keyword parsing when the model is unavailable.
+- **BI:** a Power BI project (PBIP/TMDL) with 37 documented DAX measures.
+
+The site and documentation are in Portuguese. Built by [Felipe Rodrigues Gomes](https://www.linkedin.com/in/feliperodriguesgomes/), economist and BI analyst in Brazilian health insurance.
 
 ---
 

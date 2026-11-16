@@ -5,8 +5,8 @@
 /* answered 41: nenhum texto fica sobre o verde; --color-accent-ink existe só para o contrato de tokens, o verde como texto usa --color-accent-text (contraste 5,3:1 no papel) */
 /* waive 58: site de dados com oito perguntas; cada seção tem um número, um gráfico e uma nota de método curta, e cortar as notas tiraria a honestidade sobre o dado */
 /* waive 65: papel claro e tinta azul foram aprovados pelo autor como identidade do projeto, a mesma do Power BI; não há serifa de alto contraste nem acento argila */
-@import url("./tokens.css");
-@import url("./base.css");
+@import url("./tokens.css?v=__V__");
+@import url("./base.css?v=__V__");
 
 /* ---------- base da página ---------- */
 html { scroll-behavior: smooth; scroll-padding-top: 64px; }

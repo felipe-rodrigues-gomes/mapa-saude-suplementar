@@ -25,6 +25,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Versão da publicação nos endereços de css, js e dados
+        run: sed -i "s/__V__/${GITHUB_SHA::8}/g" site/index.html site/css/site.css
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

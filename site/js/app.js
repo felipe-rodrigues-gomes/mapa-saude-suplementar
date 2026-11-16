@@ -33,9 +33,11 @@ function svgBase(alvo, w, h, rotulo) {
   alvo.appendChild(s);
   return s;
 }
+// versão da publicação (vem do ?v= do próprio script): dados com endereço novo a cada deploy, nenhum cache serve dado velho
+const VERSAO = new URL(import.meta.url).searchParams.get("v") || "";
 const cache = {};
 function dados(nome) {
-  if (!cache[nome]) cache[nome] = fetch(`dados/${nome}.json`).then((r) => { if (!r.ok) throw new Error(nome); return r.json(); });
+  if (!cache[nome]) cache[nome] = fetch(`dados/${nome}.json?v=${VERSAO}`).then((r) => { if (!r.ok) throw new Error(nome); return r.json(); });
   return cache[nome];
 }
 

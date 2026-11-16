@@ -47,4 +47,4 @@ Link direto para uma ficha: `#operadora/<registro ANS>` (ex.: `#operadora/326305
 - `sloplint`: 0 falha; os mesmos 2 avisos registrados.
 
 ## Falta
-- Domínio mapa.feliperodrigues.cloud (DNS na Hostinger + serviço no EasyPanel). O rodapé já aponta para o LinkedIn (16/11).
+- Nada. No ar em https://mapa.feliperodrigues.cloud (EasyPanel, projeto n8n_evo, serviço mapa, deploy automático, Let's Encrypt) desde 16/11; o GitHub Pages segue como cópia.

@@ -3,7 +3,7 @@
 **Os dados públicos da ANS sobre planos de saúde, organizados para ler.**
 Quanto da mensalidade volta em atendimento, de onde vem o lucro, quem mais gera reclamação no seu estado e como a sua operadora se compara às concorrentes: as 682 operadoras médicas ativas, com dados abertos da ANS e do IBGE.
 
-**[Abrir o site](https://felipe-rodrigues-gomes.github.io/mapa-saude-suplementar/)** · abre no celular, sem login · [ficha da operadora, exemplo](https://felipe-rodrigues-gomes.github.io/mapa-saude-suplementar/#operadora/326305)
+**[Abrir o site](https://mapa.feliperodrigues.cloud/)** · abre no celular, sem login · [ficha da operadora, exemplo](https://mapa.feliperodrigues.cloud/#operadora/326305) · cópia no [GitHub Pages](https://felipe-rodrigues-gomes.github.io/mapa-saude-suplementar/)
 
 ![Abertura do site: o lucro vem das aplicações](docs/img/abertura.png)
 

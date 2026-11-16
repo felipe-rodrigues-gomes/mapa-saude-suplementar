@@ -7,7 +7,9 @@
 // Variáveis (EasyPanel): GEMINI_API_KEY, GEMINI_MODELO (padrão gemini-flash-lite-latest),
 // GROQ_API_KEY + GROQ_MODELO (opcional, reserva), LIMITE_DIA (padrão 1200 interpretações/dia no total),
 // LIMITE_IP_MIN (padrão 8), LIMITE_IP_DIA (padrão 40), PORTA (padrão 3000).
+// Contador de visitas (visitas.mjs): DADOS_DIR (padrão /data, volume) e VISITAS_CHAVE (senha do painel /api/painel).
 import http from "node:http";
+import * as visitas from "./visitas.mjs";
 
 const env = process.env;
 const PORTA = Number(env.PORTA || 3000);
@@ -131,6 +133,16 @@ async function interpretar(pergunta, uf) {
   return out;
 }
 
+// teto de eventos do contador: 60 por minuto por IP (evita inflar os números)
+const eventos = new Map();
+function eventoPermitido(ip) {
+  const agora = Date.now(), e = eventos.get(ip) || { n: 0, t: agora };
+  if (agora - e.t > 60_000) { e.n = 0; e.t = agora; }
+  e.n++; eventos.set(ip, e);
+  if (eventos.size > 5000) eventos.clear();
+  return e.n <= 60;
+}
+
 // ---------------------------------------------------------------- HTTP
 function responder(res, status, obj) {
   res.writeHead(status, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" });
@@ -140,6 +152,24 @@ const servidor = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://x");
   if (req.method === "GET" && url.pathname === "/api/saude") {
     return responder(res, 200, { ok: true, gemini: !!env.GEMINI_API_KEY, modelo: GEMINI_MODELO, groq: !!(env.GROQ_API_KEY && env.GROQ_MODELO), hoje: totalDia, limite: LIMITE_DIA });
+  }
+  const ipReq = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
+  const ua = String(req.headers["user-agent"] || "");
+  // contador de visitas: eventos pequenos, sem resposta útil (204), com teto por IP
+  if (req.method === "POST" && (url.pathname === "/api/visita" || url.pathname === "/api/visita/fim")) {
+    if (!eventoPermitido(ipReq)) { res.writeHead(204); return res.end(); }
+    let c = "";
+    for await (const parte of req) { c += parte; if (c.length > 1500) { res.writeHead(413); return res.end(); } }
+    let ev = {};
+    try { ev = JSON.parse(c || "{}"); } catch { /* corpo inválido: ignora */ }
+    if (url.pathname === "/api/visita") visitas.visita(ev, ipReq, ua); else visitas.saida(ev, ua);
+    res.writeHead(204, { "cache-control": "no-store" }); return res.end();
+  }
+  if (req.method === "GET" && url.pathname === "/api/painel") {
+    if (!env.VISITAS_CHAVE || url.searchParams.get("chave") !== env.VISITAS_CHAVE) return responder(res, 403, { erro: "chave inválida" });
+    if (url.searchParams.get("formato") === "json") return responder(res, 200, visitas.resumo(90));
+    res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" });
+    return res.end(visitas.painelHtml());
   }
   if (req.method !== "POST" || url.pathname !== "/api/perguntar") return responder(res, 404, { erro: "não encontrado" });
   let corpo = "";
@@ -151,6 +181,7 @@ const servidor = http.createServer(async (req, res) => {
   const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
   const bloqueio = permitir(ip);
   if (bloqueio) return responder(res, 429, { erro: bloqueio === "dia" ? "limite do dia" : "muitas perguntas seguidas" });
+  if (!visitas.ehRobo(ua)) visitas.pergunta();
   try {
     const r = await interpretar(pergunta, uf);
     console.log(`${new Date().toISOString()} ${r.provedor}${r.cache ? " cache" : ""} ${r.intencao}`);   // sem a pergunta e sem IP: podem ter dado pessoal

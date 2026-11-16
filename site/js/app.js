@@ -512,8 +512,32 @@ function rota() {
   if (m) abrirFicha(m[1], true);
 }
 
+// ---------------------------------------------------------------- contador de visitas (sem cookie)
+// Uma visita por carregamento (com a origem: ?o= do link ou o site de onde a pessoa veio) e, ao sair,
+// os capítulos que apareceram na tela, o tempo na página e o estado escolhido. Nada de identificação:
+// o servidor (ia/visitas.mjs) guarda só contagens. Na cópia do GitHub Pages não há /api e nada é enviado.
+function contarVisita() {
+  try {
+    const q = new URLSearchParams(location.search);
+    fetch("api/visita", { method: "POST", headers: { "content-type": "application/json" }, keepalive: true,
+      body: JSON.stringify({ o: q.get("o") || "", ref: document.referrer || "" }) }).catch(() => {});
+    const vistos = new Set(), t0 = Date.now();
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) vistos.add(e.target.id); }), { threshold: 0.35 });
+    $$("#inicio, section.capitulo[id], #operadora, #metodo").forEach((s) => io.observe(s));
+    let enviado = false;
+    const sair = () => {
+      if (enviado) return;
+      enviado = true;
+      if (navigator.sendBeacon) navigator.sendBeacon("api/visita/fim", JSON.stringify({ c: [...vistos], s: Math.round((Date.now() - t0) / 1000), uf: UF }));
+    };
+    addEventListener("pagehide", sair);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") sair(); });
+  } catch { /* o contador nunca atrapalha o site */ }
+}
+
 // ---------------------------------------------------------------- início
 (async () => {
+  contarVisita();
   if (/^#(reclamacoes|compare|operadora)\//.test(location.hash)) history.scrollRestoration = "manual";
   ligarEstados();
   capituloAtual();

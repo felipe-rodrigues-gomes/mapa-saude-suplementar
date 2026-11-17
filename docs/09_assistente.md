@@ -63,3 +63,8 @@ portabilidade, como reclamar, outro. O contador soma, por dia, a intenção de c
 fora. O texto continua sem ser gravado em lugar nenhum: fica só a classificação. O painel mostra as duas contagens
 ("O que perguntaram ao assistente" e "Perguntas que o mapa ainda não responde, por tema"), que servem para escolher
 o próximo capítulo do site.
+
+Teste no ar com o Gemini, 9 de 9 certas: negativa de cirurgia (negativa), cancelar o plano (cancelamento), cobertura
+de ressonância (cobertura), prazo do reembolso (reembolso), aumento de 20% (reajuste), trocar de plano sem carência
+(portabilidade), onde reclamar na ANS (como_reclamar); "quem tem menos reclamação no Ceará" continua em
+"reclamacoes", sem tema. Os testes foram feitos com identificador de robô, para não entrar na contagem.

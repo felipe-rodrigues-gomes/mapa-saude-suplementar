@@ -57,7 +57,7 @@ function origem(o, ref) {
   if (/google\./.test(h)) return "google";
   if (/(facebook|instagram)\.com$/.test(h)) return "meta";
   if (/(t\.co|x\.com|twitter\.com)$/.test(h)) return "x";
-  return "outro";
+  return "outro:" + h.slice(0, 40); // o site de origem (não é dado pessoal), para saber de onde vem o "outro"
 }
 
 export function ehRobo(ua) { return !ua || ROBO.test(ua); }

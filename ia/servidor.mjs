@@ -20,6 +20,9 @@ const LIMITE_IP_DIA = Number(env.LIMITE_IP_DIA || 40);
 
 const INTENCOES = ["operadora", "reclamacoes", "comparar", "preco", "lucro", "mensalidade", "mercado", "glossario", "fora"];
 const TERMOS = ["sinistralidade", "idss", "reclamacao", "indice_combinado", "preco_tabela", "glosa", "ressarcimento_sus", "aplicacoes", "participacao_mercado", "mensalidade_media"];
+// perguntas "fora" do site, por tema (lista fechada): mostra o que as pessoas procuram e o mapa ainda não responde,
+// sem guardar o texto da pergunta. Ideia de Diego Arruda nos comentários do LinkedIn.
+const TEMAS_FORA = ["cancelamento", "negativa", "cobertura", "reembolso", "carencia", "reajuste", "rede", "portabilidade", "como_reclamar", "outro"];
 const UFS = ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"];
 
 const INSTRUCAO = `Você classifica perguntas feitas no site "Mapa da saúde suplementar", que mostra dados públicos da ANS sobre operadoras de plano de saúde no Brasil.
@@ -42,7 +45,18 @@ idade: idade citada (número inteiro), ou null.
 contratacao: "individual", "empresarial" ou "adesao" se citado, ou null.
 acomodacao: "enfermaria" ou "apartamento" se citado, ou null.
 ordem: "menos" se a pergunta busca o menor/melhor (menos reclamação, mais barato), "mais" se busca o maior/pior, ou null.
-termo: para "glossario", um destes: ${TERMOS.join(", ")}; senão null.`;
+termo: para "glossario", um destes: ${TERMOS.join(", ")}; senão null.
+tema: SÓ para "fora", o assunto da pergunta; senão null.
+- "cancelamento": cancelar o plano, multa ou aviso de cancelamento, plano cancelado pela operadora
+- "negativa": operadora negou ou não autorizou cirurgia, exame, internação ou tratamento; demora na autorização
+- "cobertura": se o plano cobre um exame, cirurgia, remédio ou terapia; rol da ANS
+- "reembolso": reembolso de consulta ou procedimento, valor ou prazo do reembolso
+- "carencia": prazos de carência, doença preexistente, cobertura parcial temporária
+- "reajuste": aumento da mensalidade, reajuste anual ou por faixa etária
+- "rede": rede credenciada, achar médico ou hospital, descredenciamento, demora para marcar
+- "portabilidade": trocar de plano ou de operadora levando as carências
+- "como_reclamar": como ou onde reclamar, abrir reclamação na ANS, ouvidoria
+- "outro": qualquer outro assunto`;
 
 const ESQUEMA = {
   type: "OBJECT",
@@ -55,6 +69,7 @@ const ESQUEMA = {
     acomodacao: { type: "STRING", nullable: true, enum: ["enfermaria", "apartamento"] },
     ordem: { type: "STRING", nullable: true, enum: ["mais", "menos"] },
     termo: { type: "STRING", nullable: true, enum: TERMOS },
+    tema: { type: "STRING", nullable: true, enum: TEMAS_FORA },
   },
   required: ["intencao", "operadoras"],
 };
@@ -64,10 +79,12 @@ function limpar(x) {
   const de = (v, lista) => (lista.includes(v) ? v : null);
   const ops = Array.isArray(x?.operadoras) ? x.operadoras.filter((s) => typeof s === "string").map((s) => s.slice(0, 60)).slice(0, 4) : [];
   const idade = Number.isInteger(x?.idade) && x.idade >= 0 && x.idade <= 110 ? x.idade : null;
+  const intencao = de(x?.intencao, INTENCOES) || "fora";
   return {
-    intencao: de(x?.intencao, INTENCOES) || "fora", operadoras: ops, uf: de(String(x?.uf || "").toUpperCase(), UFS), idade,
+    intencao, operadoras: ops, uf: de(String(x?.uf || "").toUpperCase(), UFS), idade,
     contratacao: de(x?.contratacao, ["individual", "empresarial", "adesao"]), acomodacao: de(x?.acomodacao, ["enfermaria", "apartamento"]),
     ordem: de(x?.ordem, ["mais", "menos"]), termo: de(x?.termo, TERMOS),
+    tema: intencao === "fora" ? de(x?.tema, TEMAS_FORA) || "outro" : null,
   };
 }
 
@@ -92,7 +109,7 @@ async function groq(pergunta, uf) {
     method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${env.GROQ_API_KEY}` },
     body: JSON.stringify({
       model: env.GROQ_MODELO, temperature: 0, max_tokens: 400, response_format: { type: "json_object" },
-      messages: [{ role: "system", content: INSTRUCAO + "\nCampos: intencao, operadoras, uf, idade, contratacao, acomodacao, ordem, termo." },
+      messages: [{ role: "system", content: INSTRUCAO + "\nCampos: intencao, operadoras, uf, idade, contratacao, acomodacao, ordem, termo, tema." },
         { role: "user", content: `Estado escolhido no site: ${uf || "nenhum"}.\nPergunta: ${pergunta}` }],
     }),
     signal: AbortSignal.timeout(8000),
@@ -181,10 +198,12 @@ const servidor = http.createServer(async (req, res) => {
   const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
   const bloqueio = permitir(ip);
   if (bloqueio) return responder(res, 429, { erro: bloqueio === "dia" ? "limite do dia" : "muitas perguntas seguidas" });
-  if (!visitas.ehRobo(ua)) visitas.pergunta();
+  const humano = !visitas.ehRobo(ua);
+  if (humano) visitas.pergunta();
   try {
     const r = await interpretar(pergunta, uf);
-    console.log(`${new Date().toISOString()} ${r.provedor}${r.cache ? " cache" : ""} ${r.intencao}`);   // sem a pergunta e sem IP: podem ter dado pessoal
+    if (humano) visitas.assunto(r.intencao, r.tema);   // só a classificação, nunca o texto
+    console.log(`${new Date().toISOString()} ${r.provedor}${r.cache ? " cache" : ""} ${r.intencao}${r.tema ? "/" + r.tema : ""}`);   // sem a pergunta e sem IP: podem ter dado pessoal
     return responder(res, 200, r);
   } catch (e) {
     console.error(`${new Date().toISOString()} falha: ${e.message}`);

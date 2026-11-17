@@ -89,6 +89,17 @@ export function saida({ c, s, uf } = {}, ua) {
 
 export function pergunta() { soma(dia(), "perguntas"); sujo = true; }
 
+// do que se perguntou: só a classificação da IA (listas fechadas), nunca o texto
+const INTENCOES = new Set(["operadora", "reclamacoes", "comparar", "preco", "lucro", "mensalidade", "mercado", "glossario", "fora"]);
+const TEMAS = new Set(["cancelamento", "negativa", "cobertura", "reembolso", "carencia", "reajuste", "rede", "portabilidade", "como_reclamar", "outro"]);
+export function assunto(intencao, tema) {
+  if (!INTENCOES.has(intencao)) return;
+  const d = dia();
+  soma((d.intencoes ??= {}), intencao);
+  if (intencao === "fora" && TEMAS.has(tema)) soma((d.temas ??= {}), tema);
+  sujo = true;
+}
+
 export function resumo(dias = 30) {
   const chaves = Object.keys(base.dias).sort().slice(-dias);
   return Object.fromEntries(chaves.map((k) => [k, base.dias[k]]));
@@ -99,11 +110,11 @@ const lista = (obj) => Object.entries(obj || {}).sort((a, b) => b[1] - a[1]).map
 
 export function painelHtml() {
   const r = resumo(60), dias = Object.keys(r).sort().reverse();
-  const tot = { visitas: 0, visitantes: 0, perguntas: 0, origens: {}, capitulos: {}, estados: {}, faixas: {}, tempo: 0, n: 0 };
+  const tot = { visitas: 0, visitantes: 0, perguntas: 0, origens: {}, capitulos: {}, estados: {}, faixas: {}, intencoes: {}, temas: {}, tempo: 0, n: 0 };
   for (const k of dias) {
     const d = r[k];
     tot.visitas += d.visitas; tot.visitantes += d.visitantes; tot.perguntas += d.perguntas; tot.tempo += d.tempo.soma; tot.n += d.tempo.n;
-    for (const [a, b] of [["origens", d.origens], ["capitulos", d.capitulos], ["estados", d.estados], ["faixas", d.tempo.faixas]]) for (const [x, v] of Object.entries(b || {})) soma(tot[a], x, v);
+    for (const [a, b] of [["origens", d.origens], ["capitulos", d.capitulos], ["estados", d.estados], ["faixas", d.tempo.faixas], ["intencoes", d.intencoes], ["temas", d.temas]]) for (const [x, v] of Object.entries(b || {})) soma(tot[a], x, v);
   }
   const media = (s, n) => (n ? `${Math.round(s / n)} s` : "—");
   const linhas = dias.map((k) => { const d = r[k]; return `<tr><td>${k}</td><td>${d.visitantes}</td><td>${d.visitas}</td><td>${lista(d.origens)}</td><td>${media(d.tempo.soma, d.tempo.n)}</td><td>${d.perguntas}</td></tr>`; }).join("");
@@ -117,7 +128,9 @@ table{border-collapse:collapse;width:100%;font-size:14px;background:#fefdfc}td,t
 <h2>Até onde leram (capítulos que apareceram na tela)</h2><p>${lista(tot.capitulos)}</p>
 <h2>Tempo na página</h2><p>${lista(tot.faixas)}</p>
 <h2>Estado escolhido ao sair</h2><p>${lista(tot.estados)}</p>
+<h2>O que perguntaram ao assistente</h2><p>${lista(tot.intencoes)}</p>
+<h2>Perguntas que o mapa ainda não responde, por tema</h2><p>${lista(tot.temas)}</p>
 <h2>Por dia</h2><table><tr><th>Dia</th><th>Visitantes</th><th>Visitas</th><th>Origem</th><th>Tempo médio</th><th>Perguntas</th></tr>${linhas}</table>
-<p>Sem cookie e sem IP guardado. Visitante = pessoa distinta no dia (resumo apagado na virada do dia). Robôs e prévias de link não contam. Horário de Fortaleza.</p>
+<p>Das perguntas fica só a classificação (intenção e tema, de listas fechadas), nunca o texto. Contagem desde 17/11/2026. Sem cookie e sem IP guardado. Visitante = pessoa distinta no dia (resumo apagado na virada do dia). Robôs e prévias de link não contam. Horário de Fortaleza.</p>
 </body></html>`;
 }

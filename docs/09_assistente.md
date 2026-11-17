@@ -19,7 +19,7 @@ Botão flutuante que responde perguntas em português com os números do própri
 - Limites no servidor: 8 perguntas por minuto e 40 por dia por IP, 1.200 por dia no total (`LIMITE_IP_MIN`,
   `LIMITE_IP_DIA`, `LIMITE_DIA`), abaixo da cota gratuita. Perguntas repetidas saem do cache, sem chamar o modelo.
 - No plano gratuito, o provedor pode usar as perguntas para melhorar os modelos dele. Por isso o painel pede para não
-  digitar dados pessoais, e o servidor não grava pergunta nem IP: o log tem só a hora e a intenção.
+  digitar dados pessoais, e o servidor não grava pergunta nem IP: o log tem só a hora, a intenção e, nas perguntas fora do site, o tema.
 
 ## Hospedagem
 
@@ -54,3 +54,12 @@ GitHub, Google…), e, ao sair, os capítulos que apareceram na tela, o tempo na
 Visitante distinto no dia = resumo (hash) de segredo + dia + IP + navegador, apagado na virada do dia.
 Robôs e prévias de link não contam. Os números ficam no volume `/data` do serviço; o painel é
 `/api/painel?chave=…` (variável `VISITAS_CHAVE` no EasyPanel).
+
+## O que o mapa ainda não responde (17/11/2026)
+
+Ideia de Diego Arruda nos comentários do post no LinkedIn. As perguntas classificadas como "fora" do site ganharam
+um **tema**, também de lista fechada: cancelamento, negativa, cobertura, reembolso, carência, reajuste, rede,
+portabilidade, como reclamar, outro. O contador soma, por dia, a intenção de cada pergunta e o tema das que caem
+fora. O texto continua sem ser gravado em lugar nenhum: fica só a classificação. O painel mostra as duas contagens
+("O que perguntaram ao assistente" e "Perguntas que o mapa ainda não responde, por tema"), que servem para escolher
+o próximo capítulo do site.
